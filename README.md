@@ -3,7 +3,9 @@ The code expects BSX files as given by BrickStock. Files from similar programmes
 It should be possible to create orders by only editing settings.txt and bsx_list.txt without touching the Python code.
 
 You can order the same BSX file multiple times by putting the number of times behind the name, as in the example:
+
 examplebsx1            [ordered once]
+
 examplebsx2 5          [ordered five times]
 
 If the files have no extension then ".bsx" is assumed.
