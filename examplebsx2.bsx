@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE BrickStockXML>
+<BrickStockXML>
+ <Inventory>
+  <Item>
+   <ItemID>3035</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>4</ColorID>
+   <ItemName>Plate 4 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Orange</ColorName>
+   <CategoryID>26</CategoryID>
+   <CategoryName>Plate</CategoryName>
+   <Status>I</Status>
+   <Qty>52</Qty>
+   <Price>0.000</Price>
+   <Condition>N</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+  <Item>
+   <ItemID>3460</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>41</ColorID>
+   <ItemName>Plate 1 x 8</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Aqua</ColorName>
+   <CategoryID>26</CategoryID>
+   <CategoryName>Plate</CategoryName>
+   <Status>I</Status>
+   <Qty>26</Qty>
+   <Price>0.000</Price>
+   <Condition>U</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+  <Item>
+   <ItemID>3961</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Dish 8 x 8 Inverted (Radar)</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <CategoryID>116</CategoryID>
+   <CategoryName>Dish</CategoryName>
+   <Status>I</Status>
+   <Qty>4</Qty>
+   <Price>0.000</Price>
+   <Condition>N</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+  <Item>
+   <ItemID>30503</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Wedge, Plate 4 x 4 Cut Corner</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <CategoryID>583</CategoryID>
+   <CategoryName>Wedge, Plate</CategoryName>
+   <Status>I</Status>
+   <Qty>58</Qty>
+   <Price>0.000</Price>
+   <Condition>U</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+  <Item>
+   <ItemID>3029</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 4 x 12</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <CategoryID>26</CategoryID>
+   <CategoryName>Plate</CategoryName>
+   <Status>I</Status>
+   <Qty>20</Qty>
+   <Price>0.000</Price>
+   <Condition>N</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+  <Item>
+   <ItemID>60479</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>85</ColorID>
+   <ItemName>Plate 1 x 12</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Dark Bluish Gray</ColorName>
+   <CategoryID>26</CategoryID>
+   <CategoryName>Plate</CategoryName>
+   <Status>I</Status>
+   <Qty>8</Qty>
+   <Price>0.000</Price>
+   <Condition>N</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+  <Item>
+   <ItemID>3623</ItemID>
+   <ItemTypeID>P</ItemTypeID>
+   <ColorID>86</ColorID>
+   <ItemName>Plate 1 x 3</ItemName>
+   <ItemTypeName>Part</ItemTypeName>
+   <ColorName>Light Bluish Gray</ColorName>
+   <CategoryID>26</CategoryID>
+   <CategoryName>Plate</CategoryName>
+   <Status>I</Status>
+   <Qty>388</Qty>
+   <Price>0.000</Price>
+   <Condition>U</Condition>
+   <OrigQty>0</OrigQty>
+  </Item>
+ </Inventory>
+ <GuiState Application="BrickStock" Version="1">
+  <ItemView>
+   <ColumnOrder>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30</ColumnOrder>
+   <ColumnWidths>21,45,65,173,35,95,35,53,53,35,35,53,53,77,77,35,53,35,53,35,53,0,0,0,0,0,0,35,35,53,53</ColumnWidths>
+   <ColumnWidthsHidden>0,0,0,0,0,0,0,0,0,35,35,53,0,0,0,35,53,35,53,35,53,53,53,53,53,65,35,35,35,53,53</ColumnWidthsHidden>
+   <SortColumn>32</SortColumn>
+   <SortDirection>A</SortDirection>
+  </ItemView>
+ </GuiState>
+</BrickStockXML>

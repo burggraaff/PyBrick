@@ -1,0 +1,11 @@
+shipto: NL # Your country ; you will have to find the abbreviation from the Bricklink search function (usually it is what you would think, eg NL for Netherlands)
+region: Europe # Region to ship from ; 8 options are None, Asia, Africa, North America, South America, Middle East, Europe, Australia & Oceania (one entry)
+verbose: 1 # do you want to be told what is going on? 0 = False ; 1 = True
+preferred_countries: Netherlands # countries that should be prioritised, e.g. where shipping is fast or cheap
+weight_close: 20 # extra value to add to price for every vendor in a preferred country. Higher value means orders with fewer different vendors are preferred. You may want to change this depending on your currency.
+weight_far: 150 # same but for vendors not in preferred countries.
+harsh: 0 # force the programme to only search in the preferred_countries? 0 = False ; 1 = True
+timeout: 10.0 # time to spend on optimalisation in *minutes* ; raise if you are not getting enough possibilities
+maxvendors: 5 # maximum number of vendors to consider in a possible order... sort of. Very finicky and needs to be made consistent and clear. Most important parameter to tweak if you are not getting desired results -- either direction can work depending on your other settings, location and bricks to order
+vendorlist_length: 250 # max number of vendors to search for on bricklink per brick -- more means more possible orders but it will be slower
+blacklist: # vendors to never use
