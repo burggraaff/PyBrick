@@ -5,7 +5,7 @@ Olivier Burggraaff
 Function definitions
 """
 
-import .classes as c
+from . import classes as c
 import mechanize
 import xml.etree.ElementTree as ET
 import requests

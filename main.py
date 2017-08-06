@@ -5,7 +5,7 @@ Olivier Burggraaff
 Main script
 """
 
-from PyBL import classes as c, functions as f
+from PyBrick import classes as c, functions as f
 import time
 import datetime
 import random as ran

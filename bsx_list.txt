@@ -1,1 +1,2 @@
-Paranal-delta.bsx
+examplebsx1
+examplebsx2
