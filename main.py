@@ -6,9 +6,16 @@ Main script
 """
 
 from PyBrick import classes as c, functions as f
+from argparse import ArgumentParser
 import time
 import datetime
 import random as ran
+
+parser = ArgumentParser()
+parser.add_argument("-s", "save_to", help = "Location to save order list to", default = "best.order")
+parser.add_argument("-e", "--settings_file", help = "File containing settings", default = "settings.txt")
+parser.add_argument("-q", "--quiet", action = "store_true")
+args = parser.parse_args()
 
 settings = f.read_settings()
 bsx_files = f.read_bsx_files()

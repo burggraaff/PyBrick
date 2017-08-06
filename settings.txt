@@ -1,7 +1,6 @@
 shipto: NL # Your country ; you will have to find the abbreviation from the Bricklink search function (usually it is what you would think, eg NL for Netherlands)
 region: Europe # Region to ship from ; 8 options are None, Asia, Africa, North America, South America, Middle East, Europe, Australia & Oceania (one entry)
-verbose: 1 # do you want to be told what is going on? 0 = False ; 1 = True
-preferred_countries: Netherlands # countries that should be prioritised, e.g. where shipping is fast or cheap
+preferred_countries: Netherlands, Germany # countries that should be prioritised, e.g. where shipping is fast or cheap
 weight_close: 20 # extra value to add to price for every vendor in a preferred country. Higher value means orders with fewer different vendors are preferred. You may want to change this depending on your currency.
 weight_far: 150 # same but for vendors not in preferred countries.
 harsh: 0 # force the programme to only search in the preferred_countries? 0 = False ; 1 = True
