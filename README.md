@@ -21,3 +21,5 @@ Use the "-t" (timeout) and "-m" (maximum number of different vendors to use) key
 A longer timeout will generally give a better result, though with diminishing results. 
 
 Tweak the maximum vendors keyword ("-m") to get different results if you are struggling. Adjusting it upwards or downwards can both help -- it's mostly trial-and-error.
+
+Use the settings file to adjust settings that are probably permanent (i.e. not changed on every run) such as your location, which countries you prefer to order from (for shipping costs for example), etc.
