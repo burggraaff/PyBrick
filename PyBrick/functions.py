@@ -22,35 +22,27 @@ else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
-default_settings = {"shipto": "NL", "region": "Europe", "preferred_countries": \
-["Netherlands", "Germany", "Belgium", "United Kingdom", "Luxembourg"], "maxvendors":\
-5, "timeout": 1./60, "vendorlist_length": 250, "verbose": True, "harsh": False, "weight_close": 20.,\
-"weight_far": 100., "blacklist": []}
+#default_settings = {"shipto": "NL", "region": "Europe", "preferred_countries": \
+#["Netherlands", "Germany", "Belgium", "United Kingdom", "Luxembourg"], "maxvendors":\
+#5, "timeout": 1./60, "vendorlist_length": 250, "verbose": True, "harsh": False, "weight_close": 20.,\
+#"weight_far": 100., "blacklist": []}
 
-def read_settings(fileloc = None):
+def read_settings(args):
     regions = ["None", "Asia", "Africa", "North America", "South America", "Middle East", "Europe", "Australia & Oceania"]
-    while fileloc is None:
-        try:
-            fileloc = raw_input("Where is your settings file located?\n")
-            x = open(fileloc, mode="r")
-        except:
-            fileloc = None
-    x = open(fileloc, mode="r")
+    x = open(args.settings_file, mode = 'r')
     lines = x.readlines()
-    s = [line.split("#")[0].strip().split(":") for line in lines]
+    s = [line.split('#')[0].strip().split(":") for line in lines]
     k = {s_el[0].strip(): s_el[1].strip() for s_el in s}
-    for key in default_settings.keys():
-        if key not in k.keys():
-            print "Did not find key '{0}' in settings; using default ({1})".format(key, default_settings[key])
-            k[key] = default_settings[key]
-    for key in k.keys():
-        if key not in default_settings.keys():
-            print "Unrecognised setting '{0}' entered; will be ignored".format(key)
-            k.pop(key)
-    if not isinstance(k["timeout"], (int, float)):
-        k["timeout"] = float(k["timeout"])
+    #for key in default_settings.keys():
+    #    if key not in k.keys():
+    #        print "Did not find key '{0}' in settings; using default ({1})".format(key, default_settings[key])
+    #        k[key] = default_settings[key]
+    #for key in k.keys():
+    #    if key not in default_settings.keys():
+    #        print "Unrecognised setting '{0}' entered; will be ignored".format(key)
+    #        k.pop(key)
+    k["timeout"] = float(k["timeout"])
     k["preferred_countries"] = [country.strip() for country in k["preferred_countries"].split(",")]
-    k["verbose"] = (k["verbose"] == "1")
     k["harsh"] = (k["harsh"] == "1")
     k["maxvendors"] = int(k["maxvendors"])
     k["weight_close"] = float(k["weight_close"])
@@ -63,13 +55,7 @@ def read_settings(fileloc = None):
 
     return k
 
-def read_bsx_files(fileloc = None):
-    while fileloc is None:
-        try:
-            fileloc = raw_input("Where is your list of BSX files to read located?\n")
-            x = open(fileloc, mode="r")
-        except:
-            fileloc = None
+def read_bsx_files(fileloc):
     x = open(fileloc, mode="r")
     lines = x.readlines()
     s = [line.split(" ") for line in lines]
@@ -79,7 +65,7 @@ def read_bsx_files(fileloc = None):
     r = [el if ("." in el) else el+".bsx" for el in r]
     return r
 
-def read_bricks(files, settings, nr = -1):
+def read_bricks(files, nr = -1, quiet = False):
     """
     Parse a list of BSX files into a list of Brick objects
 
@@ -89,8 +75,11 @@ def read_bricks(files, settings, nr = -1):
         List (or other iterable) of files to parse
     nr: int, optional
         Return only the first nr bricks (-1 if all)
-    v: dict
-        global settings
+		This is for debugging
+		Default: -1
+    quiet: bool, optional
+		If True, do not print outputs
+		Default: False
 
     Returns
     -------
@@ -100,11 +89,11 @@ def read_bricks(files, settings, nr = -1):
 
     allbricks_ = []
 
-    if settings["verbose"]:
-        print "Will now start reading bricks from files: {0}".format(files)
+    if not quiet:
+        print "Will now start reading bricks from files:\n{0}".format(files)
 
     for bsx in files:
-        if settings["verbose"]:
+        if not quiet:
             print bsx,
 
         known_parts = [part.code for part in allbricks_]
@@ -117,13 +106,14 @@ def read_bricks(files, settings, nr = -1):
             try: # if we already know about this brick, add the quantity
                 ind = known_parts.index(part.code)
                 allbricks_[ind] += part
-                print "Found duplicate:", part.code
+                if not quiet:
+                    print "Found duplicate:", part.code
             except ValueError: # if the brick is unknown, add it to the list
                 allbricks_.append(part)
 
     allbricks_.sort(key=lambda part: -part.qty)
 
-    if settings["verbose"]:
+    if not quiet:
         print ""
 
     if nr != -1:
@@ -171,7 +161,7 @@ def parse_lot(part, tdtag, vendor):
     lotnr = tdtag.findAll("a")[1].attrs["href"].split("=")[-1]
     return c.Lot(part, vendor, price, qty, step, lotnr)
 
-def read_vendors(allbricks, settings):
+def read_vendors(allbricks, settings, quiet = False):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
 
@@ -182,6 +172,9 @@ def read_vendors(allbricks, settings):
         ***N.B.*** This is modified in-place
     settings: dict
         Dictionary with settings
+    quiet: bool, optional
+		If True, do not print outputs
+		Default: False
 
     Returns
     -------
@@ -192,11 +185,11 @@ def read_vendors(allbricks, settings):
     params_init = {"itemType": "P", "sellerLoc": "R", "regionID": settings["regionID"],\
         "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],\
         "searchSort": "Q", "pg": "1", "pmt": "18"}
-    if settings["verbose"]:
+    if not quiet:
         print "Will now look for vendors for {0} types of bricks".format(len(allbricks))
     try:
         for j, part in enumerate(allbricks):
-            if settings["verbose"]:
+            if not quiet:
                 print j, part.code
             URL = part.URL(params_init)
             html = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'}).text
