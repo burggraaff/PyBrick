@@ -5,10 +5,10 @@
   <Item>
    <ItemID>3035</ItemID>
    <ItemTypeID>P</ItemTypeID>
-   <ColorID>4</ColorID>
+   <ColorID>1</ColorID>
    <ItemName>Plate 4 x 8</ItemName>
    <ItemTypeName>Part</ItemTypeName>
-   <ColorName>Orange</ColorName>
+   <ColorName>White</ColorName>
    <CategoryID>26</CategoryID>
    <CategoryName>Plate</CategoryName>
    <Status>I</Status>
@@ -20,31 +20,16 @@
   <Item>
    <ItemID>3460</ItemID>
    <ItemTypeID>P</ItemTypeID>
-   <ColorID>41</ColorID>
+   <ColorID>11</ColorID>
    <ItemName>Plate 1 x 8</ItemName>
    <ItemTypeName>Part</ItemTypeName>
-   <ColorName>Aqua</ColorName>
+   <ColorName>Black</ColorName>
    <CategoryID>26</CategoryID>
    <CategoryName>Plate</CategoryName>
    <Status>I</Status>
    <Qty>26</Qty>
    <Price>0.000</Price>
    <Condition>U</Condition>
-   <OrigQty>0</OrigQty>
-  </Item>
-  <Item>
-   <ItemID>3961</ItemID>
-   <ItemTypeID>P</ItemTypeID>
-   <ColorID>85</ColorID>
-   <ItemName>Dish 8 x 8 Inverted (Radar)</ItemName>
-   <ItemTypeName>Part</ItemTypeName>
-   <ColorName>Dark Bluish Gray</ColorName>
-   <CategoryID>116</CategoryID>
-   <CategoryName>Dish</CategoryName>
-   <Status>I</Status>
-   <Qty>4</Qty>
-   <Price>0.000</Price>
-   <Condition>N</Condition>
    <OrigQty>0</OrigQty>
   </Item>
   <Item>

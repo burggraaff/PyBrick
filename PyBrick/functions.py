@@ -41,16 +41,13 @@ def read_settings(args):
     #    if key not in default_settings.keys():
     #        print "Unrecognised setting '{0}' entered; will be ignored".format(key)
     #        k.pop(key)
-    k["timeout"] = float(k["timeout"])
     k["preferred_countries"] = [country.strip() for country in k["preferred_countries"].split(",")]
     k["harsh"] = (k["harsh"] == "1")
-    k["maxvendors"] = int(k["maxvendors"])
     k["weight_close"] = float(k["weight_close"])
     k["weight_far"] = float(k["weight_far"])
     if len(k["preferred_countries"]) == 0:
         raise ValueError("No preferred countries entered. Please enter at least one, otherwise things can go wrong.\n\nIf you think that's poor design, you're right.")
     k["regionID"] = regions.index(k["region"])
-    k["timeout"] *= 60.
     k["blacklist"] = [i.strip() for i in k["blacklist"].split(",")]
 
     return k

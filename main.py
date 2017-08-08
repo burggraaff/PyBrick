@@ -15,9 +15,11 @@ parser = ArgumentParser()
 parser.add_argument("bsx_list", help = "Location of file with list of BSX files to import")
 parser.add_argument("-s", "--save_to", help = "Location to save order list to", default = "best.order")
 parser.add_argument("-e", "--settings_file", help = "File containing settings", default = "settings.txt")
+parser.add_argument("-t", "--timeout", help = "How many minutes to optimise for", type = float, default = 10.0)
+parser.add_argument("-m", "--max_vendors", help = "Maximum number of vendors to use", type = int, default = 10)
 parser.add_argument("-q", "--quiet", action = "store_true")
 args = parser.parse_args()
-
+args.timeout *= 60.
 settings = f.read_settings(args)
 if not args.quiet:
 	print "Read settings from {0}".format(args.settings_file)
@@ -75,9 +77,9 @@ for part in optimize_parts:
 	optimize_parts.remove(part)
 	notenough.append(part)
 
-t_end = datetime.datetime.now() + datetime.timedelta(seconds = settings["timeout"])
+t_end = datetime.datetime.now() + datetime.timedelta(seconds = args.timeout)
 if not args.quiet:
-	print "Starting optimisation; will take until", str(t_end.hour)+":"+str(t_end.minute)
+	print "Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute)
 j = 0
 i = 0
 vendorwarning_given = False
@@ -85,7 +87,7 @@ try:
     assert orders
 except:
     orders = []
-endat = time.time() + settings["timeout"]
+endat = time.time() + args.timeout
 while (time.time() < endat):
     i += 1
     lots_notenough = []
@@ -117,7 +119,7 @@ while (time.time() < endat):
         vendors_rare = f.vendors_of_rare_bricks(optimize_parts)
 
         nrvendors_now = len(vendors_always) + len(vendors_rare) + len(vendors_notenough)
-        x = settings["maxvendors"]-nrvendors_now
+        x = args.max_vendors-nrvendors_now
         howmany_vendors = ran.randint(1, x)
         howmany_far = 0 if settings["harsh"] else ran.randint(0, int(howmany_vendors/7))
         howmany_close_big = ran.randint(1, howmany_vendors/2+1)
@@ -148,7 +150,7 @@ while (time.time() < endat):
     lots = lots_always + lots_notenough + [f.cheapest_lot(part, try_vendors) for part in optimize_parts]
 
     order = c.Order(settings, *lots)
-    if len(order.vendors) > settings["maxvendors"]:
+    if len(order.vendors) > args.max_vendors:
         continue
     if not order.valid_minbuy():
         continue
@@ -178,7 +180,7 @@ orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 
 orders = orders[:50]
 if not args.quiet:
 	print "Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1) , "% )"
-	print "in", settings["timeout"]/60., "minutes"
+	print "in", args.timeout/60., "minutes"
 
 try:
 	best = orders[0]
