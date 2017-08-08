@@ -15,3 +15,9 @@ You will be notified in this case. Usually changing from new to used or changing
 
 The actual ordering of the items is still done manually -- since Bricklink stores are all a bit different, this would be very hard to automate. 
 However, it is much less work than it seems. You just copy a link, go to the website, enter the number and click "add to cart". It's a few seconds per brick.
+
+Use the "-t" (timeout) and "-m" (maximum number of different vendors to use) keyword arguments to get better results.
+
+A longer timeout will generally give a better result, though with diminishing results. 
+
+Tweak the maximum vendors keyword ("-m") to get different results if you are struggling. Adjusting it upwards or downwards can both help -- it's mostly trial-and-error.
