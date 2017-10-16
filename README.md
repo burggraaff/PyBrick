@@ -80,6 +80,14 @@ The main output of PyBrick is a file, by default located at `best.order`, contai
 
 If no result is achieved, one of several problems may be occurring. The most common ones are listed below. Please carefully look through these!
 
+A good practice is to run *main.py* on the example files included in this repository as follows:
+
+```
+python main.py bsx_list.txt
+```
+
+If this works, then you can move on to using your own BSX files. If not, then something is wrong either with your Python installation (e.g. missing packages) or with the script itself (e.g. if BrickLink have made changes to their website).
+
 If your problem is not solved using these example cases, feel free to contact me using the details on my profile page.
 
 ### I'm getting an ImportError message!
