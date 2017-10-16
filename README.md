@@ -68,7 +68,7 @@ As mentioned earlier, the `-e` keyword can be used to specify advanced settings 
 | `weight_far` | Additional weight given to countries that are *not* preferred. High values favour vendors in preferred countries. | `150` |
 | `harsh` | If `1`, **only** use vendors in the `preferred_countries` list. | `0` |
 | `vendorlist_length` | Number of vendors from BrickLink to parse for each brick. Higher values allow for more options to test in the optimisation, but consequently slow the process down. | `250` |
-| `blacklist` | Names of vendors that one **never** wants to order from, e.g. due to doubtful reputation or temporary shop closures. | `` (none) |
+| `blacklist` | Names of vendors that one **never** wants to order from, e.g. due to doubtful reputation or temporary shop closures. |  (none) |
 
 ## Output
 
