@@ -125,6 +125,13 @@ def read_bricks(files, nr = -1, quiet = False):
     else:
         return allbricks_
 
+def prepare_bricks(allbricks):
+    optimize_parts = list(allbricks)
+    optimize_parts.sort(key=lambda part: len(part.lots))
+    for part in optimize_parts:
+        part.sort_lots()
+	return optimize_parts
+		
 def find_vendor_name(tdtag):
     return tdtag.findAll("a")[1].text
 

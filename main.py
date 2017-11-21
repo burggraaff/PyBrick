@@ -39,12 +39,9 @@ vendors = f.read_vendors(allbricks, settings, quiet = args.quiet)
 if not args.quiet:
 	print "Made list of vendors;", len(vendors), "(", round(time.time() - vendortime, 2), ")"
 
-allbricks.sort(key=lambda part: len(part.lots))
+optimize_parts = f.prepare_bricks(allbricks)
 
-for part in allbricks:
-    part.sort_lots()
 
-optimize_parts = allbricks[:] # this is here for debugging purposes
 
 # if there is a brick with only one lot, always use that vendor and lot
 lots_always = []
@@ -131,7 +128,7 @@ while (time.time() < endat):
         break
     except ValueError:
         if not vendorwarning_given:
-            print "ValueError -- probably not enough vendors"
+            print "ValueError -- consider increasing the maximum vendor parameter"
             vendorwarning_given = True
         continue
     except:
