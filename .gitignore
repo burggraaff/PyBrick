@@ -1,5 +1,7 @@
 *.order
 test_*
+*.bsx
+!example*.bsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
