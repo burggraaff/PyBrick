@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup as soup
 import random as ran
 import ssl
+import os
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -62,6 +63,12 @@ def read_bsx_files(fileloc):
     r = [el if ("." in el) else el+".bsx" for el in r]
     return r
 
+def parse_bsx_filename_input(arg):
+	if ".bsx" in arg: # single bsx file:
+		return [arg]
+	else:
+		return read_bsx_files(arg)
+	
 def read_bricks(files, nr = -1, quiet = False):
     """
     Parse a list of BSX files into a list of Brick objects

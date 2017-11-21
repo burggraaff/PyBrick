@@ -20,11 +20,13 @@ parser.add_argument("-m", "--max_vendors", help = "Maximum number of vendors to 
 parser.add_argument("-q", "--quiet", action = "store_true")
 args = parser.parse_args()
 args.timeout *= 60.
+
 settings = f.read_settings(args)
+
 if not args.quiet:
 	print "Read settings from {0}".format(args.settings_file)
 
-bsx_files = f.read_bsx_files(args.bsx_list)
+bsx_files = f.parse_bsx_filename_input(args.bsx_list)
 if not args.quiet:
 	print "Read BSX filenames from {0}".format(args.bsx_list)
 
