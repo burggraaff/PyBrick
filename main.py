@@ -1,5 +1,5 @@
 """
-PyBL
+PyBrick
 Olivier Burggraaff
 
 Main script
