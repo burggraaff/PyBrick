@@ -29,7 +29,7 @@
    <Status>I</Status>
    <Qty>26</Qty>
    <Price>0.000</Price>
-   <Condition>U</Condition>
+   <Condition>N</Condition>
    <OrigQty>0</OrigQty>
   </Item>
   <Item>
@@ -44,7 +44,7 @@
    <Status>I</Status>
    <Qty>58</Qty>
    <Price>0.000</Price>
-   <Condition>U</Condition>
+   <Condition>N</Condition>
    <OrigQty>0</OrigQty>
   </Item>
   <Item>
@@ -63,21 +63,6 @@
    <OrigQty>0</OrigQty>
   </Item>
   <Item>
-   <ItemID>60479</ItemID>
-   <ItemTypeID>P</ItemTypeID>
-   <ColorID>85</ColorID>
-   <ItemName>Plate 1 x 12</ItemName>
-   <ItemTypeName>Part</ItemTypeName>
-   <ColorName>Dark Bluish Gray</ColorName>
-   <CategoryID>26</CategoryID>
-   <CategoryName>Plate</CategoryName>
-   <Status>I</Status>
-   <Qty>8</Qty>
-   <Price>0.000</Price>
-   <Condition>N</Condition>
-   <OrigQty>0</OrigQty>
-  </Item>
-  <Item>
    <ItemID>3623</ItemID>
    <ItemTypeID>P</ItemTypeID>
    <ColorID>86</ColorID>
@@ -89,7 +74,7 @@
    <Status>I</Status>
    <Qty>388</Qty>
    <Price>0.000</Price>
-   <Condition>U</Condition>
+   <Condition>N</Condition>
    <OrigQty>0</OrigQty>
   </Item>
  </Inventory>
