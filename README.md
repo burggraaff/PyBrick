@@ -29,7 +29,7 @@ car.bsx 10
 dog.bsx 2
 ```
 
-PyBrick will interpret the file given abose as follows: order each brick in *plane.bsx* once, each in *train.bsx* once, each brick in *car.bsx* 10 times and each brick in *dog.bsx* twice. Any duplicate bricks between these files will be handled such that the total amount required will be used in the further optimisation.
+PyBrick will interpret the file given above as follows: order each brick in *plane.bsx* once, each in *train.bsx* once, each brick in *car.bsx* 10 times and each brick in *dog.bsx* twice. Any duplicate bricks between these files will be handled such that the total amount required will be used in the further optimisation.
 
 Additionally, there are several optional arguments to tweak the performance of the *main.py* script. A short explanation of these can be found by running `python main.py --help` in the command line, or below:
 
