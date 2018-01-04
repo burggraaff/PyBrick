@@ -1,2 +1,2 @@
-from . import classes
-from . import functions
+from .classes import *
+from .functions import *
