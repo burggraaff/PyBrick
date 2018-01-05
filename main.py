@@ -24,25 +24,22 @@ args.timeout *= 60.
 
 settings = f.read_settings(args)
 
-if not args.quiet:
-	print("Read settings from {0}".format(args.settings_file))
+# print if not quiet, else do nothing
+verboseprint = print if not args.quiet else lambda *args, **kwargs: None
+
+verboseprint("Read settings from {0}".format(args.settings_file))
 
 bsx_files = f.parse_bsx_filename_input(args.bsx_list)
-if not args.quiet:
-	print("Read BSX filenames from {0}".format(args.bsx_list))
+verboseprint("Read BSX filenames from {0}".format(args.bsx_list))
 
-allbricks = f.read_bricks(bsx_files, quiet = args.quiet)
-if not args.quiet:
-	print("Made list of {0} types of bricks".format(len(allbricks)))
+allbricks = f.read_bricks(bsx_files, verboseprint=verboseprint)
+verboseprint("Made list of {0} types of bricks".format(len(allbricks)))
 
 vendortime = time.time()
-vendors = f.read_vendors(allbricks, settings, quiet = args.quiet)
-if not args.quiet:
-	print("Made list of vendors;", len(vendors), "(", round(time.time() - vendortime, 2), ")")
+vendors = f.read_vendors(allbricks, settings, verboseprint=verboseprint)
+verboseprint("Made list of vendors;", len(vendors), "(", round(time.time() - vendortime, 2), ")")
 
 optimize_parts = f.prepare_bricks(allbricks)
-
-
 
 # if there is a brick with only one lot, always use that vendor and lot
 lots_always = []
@@ -78,8 +75,7 @@ for part in optimize_parts:
 	notenough.append(part)
 
 t_end = datetime.datetime.now() + datetime.timedelta(seconds = args.timeout)
-if not args.quiet:
-	print("Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute))
+verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute))
 j = 0
 i = 0
 vendorwarning_given = False
@@ -156,35 +152,29 @@ while (time.time() < endat):
         continue
 
     j += 1
-    if not args.quiet:
-        print(j, order) #printing the orders does not significantly slow the loop down
+    verboseprint(j, order) #printing the orders does not significantly slow the loop down
     orders.append(order)
 
     if len(orders) == 400: # to conserve memory, we remove bad orders
-        if not args.quiet:
-            print("Trimming list of orders...")
+        verboseprint("Trimming list of orders...")
         orders.sort()
         orders = orders[:50]
 
     if not j%20000:
-        if not args.quiet:
-            print("Removing duplicates...")
+        verboseprint("Removing duplicates...")
         orders.sort()
         orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
 
-if not args.quiet:
-	print("\nFinished optimalisation")
+verboseprint("\nFinished optimalisation")
 orders.sort()
 orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
 orders = orders[:50]
-if not args.quiet:
-	print("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1) , "% )")
-	print("in", args.timeout/60., "minutes")
+verboseprint("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1) , "% )")
+verboseprint("in", args.timeout/60., "minutes")
 
 try:
 	best = orders[0]
-	if not args.quiet:
-		print("Best:", best)
+	verboseprint("Best:", best)
 except IndexError:
     print("Did not find any orders!")
     print("Consider changing the maxvendors and/or timeout parameters.")
@@ -201,12 +191,10 @@ if len(neverenough):
         print(n.code, ",", end=" ")
     print("\nConsider ordering these in different colours.")
 
-if not args.quiet:
-	print("The following parts have the fewest available lots:")
-	for part in optimize_parts[:10]:
-		print(part.code, "({0})".format(len(part.lots)), end=" ")
+verboseprint("The following parts have the fewest available lots:")
+for part in optimize_parts[:10]:
+    verboseprint(part.code, "({0})".format(len(part.lots)), end=" ")
 
 if len(orders) > 0:
-	if not args.quiet:
-		print("\nSaving best order to file:", args.save_to)
-	orders[0].save(args.save_to)
+    verboseprint("\nSaving best order to file:", args.save_to)
+    orders[0].save(args.save_to)

@@ -70,7 +70,7 @@ def parse_bsx_filename_input(arg):
 	else:
 		return read_bsx_files(arg)
 	
-def read_bricks(files, nr = -1, quiet = False):
+def read_bricks(files, nr = -1, verboseprint = print):
     """
     Parse a list of BSX files into a list of Brick objects
 
@@ -82,9 +82,9 @@ def read_bricks(files, nr = -1, quiet = False):
         Return only the first nr bricks (-1 if all)
 		This is for debugging
 		Default: -1
-    quiet: bool, optional
-		If True, do not print outputs
-		Default: False
+    verboseprint: function
+        Function to print with
+        Default: print
 
     Returns
     -------
@@ -94,12 +94,10 @@ def read_bricks(files, nr = -1, quiet = False):
 
     allbricks_ = []
 
-    if not quiet:
-        print("Will now start reading bricks from files:\n{0}".format(files))
+    verboseprint("Will now start reading bricks from files:\n{0}".format(files))
 
     for bsx in files:
-        if not quiet:
-            print(bsx, end=" ")
+        verboseprint(bsx, end=" ")
 
         known_parts = [part.code for part in allbricks_]
         tree = ET.parse(bsx)
@@ -111,15 +109,13 @@ def read_bricks(files, nr = -1, quiet = False):
             try: # if we already know about this brick, add the quantity
                 ind = known_parts.index(part.code)
                 allbricks_[ind] += part
-                if not quiet:
-                    print("Found duplicate:", part.code)
+                verboseprint("Found duplicate:", part.code)
             except ValueError: # if the brick is unknown, add it to the list
                 allbricks_.append(part)
 
     allbricks_.sort(key=lambda part: -part.qty)
 
-    if not quiet:
-        print()
+    verboseprint()
 
     if nr != -1:
         return allbricks_[:nr]
@@ -131,8 +127,8 @@ def prepare_bricks(allbricks):
     optimize_parts.sort(key=lambda part: len(part.lots))
     for part in optimize_parts:
         part.sort_lots()
-	return optimize_parts
-		
+        return optimize_parts
+
 def find_vendor_name(tdtag):
     return tdtag.findAll("a")[1].text
 
@@ -173,7 +169,7 @@ def parse_lot(part, tdtag, vendor):
     lotnr = tdtag.findAll("a")[1].attrs["href"].split("=")[-1]
     return c.Lot(part, vendor, price, qty, step, lotnr)
 
-def read_vendors(allbricks, settings, quiet = False):
+def read_vendors(allbricks, settings, verboseprint = print):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
 
@@ -184,9 +180,9 @@ def read_vendors(allbricks, settings, quiet = False):
         ***N.B.*** This is modified in-place
     settings: dict
         Dictionary with settings
-    quiet: bool, optional
-		If True, do not print outputs
-		Default: False
+    verboseprint: function
+        Function to print with
+        Default: print
 
     Returns
     -------
@@ -197,12 +193,10 @@ def read_vendors(allbricks, settings, quiet = False):
     params_init = {"itemType": "P", "sellerLoc": "R", "regionID": settings["regionID"],\
         "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],\
         "searchSort": "Q", "pg": "1", "pmt": "18"}
-    if not quiet:
-        print("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
+    verboseprint("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
     try:
         for j, part in enumerate(allbricks):
-            if not quiet:
-                print(j, part.code)
+            verboseprint(j, part.code)
             URL = part.URL(params_init)
             html = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'}).text
             htmlsoup = soup(html, "html.parser")
