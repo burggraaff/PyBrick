@@ -18,7 +18,6 @@ class Brick(object):
         Create a Brick object from an XML item
         """
         assert isinstance(item, ET.Element), "Did not get XML item to create Brick object; instead got "+str(type(item))
-        self.item = item.copy()
         asdict = {b.tag: b.text for b in item.getchildren()}
         for key in asdict:
             setattr(self, key, asdict[key])
