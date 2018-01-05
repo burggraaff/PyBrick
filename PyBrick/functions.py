@@ -6,13 +6,11 @@ Function definitions
 """
 
 from . import classes as c
-import mechanize
 import xml.etree.ElementTree as ET
 import requests
 from bs4 import BeautifulSoup as soup
 import random as ran
 import ssl
-import os
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
