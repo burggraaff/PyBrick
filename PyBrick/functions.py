@@ -142,9 +142,9 @@ def parse_vendor(fonttag, tdtag, settings):
         try:
             minbuy = float(font_[1][5:])
         except:
-            minbuy = None
+            minbuy = 0.0
     else:
-        minbuy = None
+        minbuy = 0.0
     storename = find_vendor_storename(tdtag)
     linktag = tdtag.findAll("a")[1]
     storename = linktag.attrs["href"].split("&")[0].split("=")[1]
