@@ -26,25 +26,12 @@ else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
-#default_settings = {"shipto": "NL", "region": "Europe", "preferred_countries": \
-#["Netherlands", "Germany", "Belgium", "United Kingdom", "Luxembourg"], "maxvendors":\
-#5, "timeout": 1./60, "vendorlist_length": 250, "verbose": True, "harsh": False, "weight_close": 20.,\
-#"weight_far": 100., "blacklist": []}
-
 def read_settings(args):
     regions = ["None", "Asia", "Africa", "North America", "South America", "Middle East", "Europe", "Australia & Oceania"]
     x = open(args.settings_file, mode = 'r')
     lines = x.readlines()
     s = [line.split('#')[0].strip().split(":") for line in lines]
     k = {s_el[0].strip(): s_el[1].strip() for s_el in s}
-    #for key in default_settings.keys():
-    #    if key not in k.keys():
-    #        print "Did not find key '{0}' in settings; using default ({1})".format(key, default_settings[key])
-    #        k[key] = default_settings[key]
-    #for key in k.keys():
-    #    if key not in default_settings.keys():
-    #        print "Unrecognised setting '{0}' entered; will be ignored".format(key)
-    #        k.pop(key)
     k["preferred_countries"] = [country.strip() for country in k["preferred_countries"].split(",")]
     k["harsh"] = (k["harsh"] == "1")
     k["weight_close"] = float(k["weight_close"])
