@@ -4,8 +4,9 @@ Olivier Burggraaff
 
 Function definitions
 """
-
+from __future__ import print_function
 from . import classes as c
+
 import mechanize
 import xml.etree.ElementTree as ET
 import requests
@@ -94,11 +95,11 @@ def read_bricks(files, nr = -1, quiet = False):
     allbricks_ = []
 
     if not quiet:
-        print "Will now start reading bricks from files:\n{0}".format(files)
+        print("Will now start reading bricks from files:\n{0}".format(files))
 
     for bsx in files:
         if not quiet:
-            print bsx,
+            print(bsx, end=" ")
 
         known_parts = [part.code for part in allbricks_]
         tree = ET.parse(bsx)
@@ -111,14 +112,14 @@ def read_bricks(files, nr = -1, quiet = False):
                 ind = known_parts.index(part.code)
                 allbricks_[ind] += part
                 if not quiet:
-                    print "Found duplicate:", part.code
+                    print("Found duplicate:", part.code)
             except ValueError: # if the brick is unknown, add it to the list
                 allbricks_.append(part)
 
     allbricks_.sort(key=lambda part: -part.qty)
 
     if not quiet:
-        print ""
+        print()
 
     if nr != -1:
         return allbricks_[:nr]
@@ -197,11 +198,11 @@ def read_vendors(allbricks, settings, quiet = False):
         "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],\
         "searchSort": "Q", "pg": "1", "pmt": "18"}
     if not quiet:
-        print "Will now look for vendors for {0} types of bricks".format(len(allbricks))
+        print("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
     try:
         for j, part in enumerate(allbricks):
             if not quiet:
-                print j, part.code
+                print(j, part.code)
             URL = part.URL(params_init)
             html = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'}).text
             htmlsoup = soup(html, "html.parser")

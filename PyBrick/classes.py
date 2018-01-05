@@ -4,7 +4,7 @@ Olivier Burggraaff
 
 Class definitions
 """
-
+from __future__ import print_function
 import xml.etree.ElementTree as ET
 import urllib
 

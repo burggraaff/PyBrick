@@ -4,6 +4,7 @@ Olivier Burggraaff
 
 Main script
 """
+from __future__ import print_function
 
 from PyBrick import classes as c, functions as f
 from argparse import ArgumentParser
@@ -24,20 +25,20 @@ args.timeout *= 60.
 settings = f.read_settings(args)
 
 if not args.quiet:
-	print "Read settings from {0}".format(args.settings_file)
+	print("Read settings from {0}".format(args.settings_file))
 
 bsx_files = f.parse_bsx_filename_input(args.bsx_list)
 if not args.quiet:
-	print "Read BSX filenames from {0}".format(args.bsx_list)
+	print("Read BSX filenames from {0}".format(args.bsx_list))
 
 allbricks = f.read_bricks(bsx_files, quiet = args.quiet)
 if not args.quiet:
-	print "Made list of {0} types of bricks".format(len(allbricks))
+	print("Made list of {0} types of bricks".format(len(allbricks)))
 
 vendortime = time.time()
 vendors = f.read_vendors(allbricks, settings, quiet = args.quiet)
 if not args.quiet:
-	print "Made list of vendors;", len(vendors), "(", round(time.time() - vendortime, 2), ")"
+	print("Made list of vendors;", len(vendors), "(", round(time.time() - vendortime, 2), ")")
 
 optimize_parts = f.prepare_bricks(allbricks)
 
@@ -60,11 +61,11 @@ vendors_close_big = vendors_close[:20]
 
 neverenough = [part for part in allbricks if sum(lot.qty for lot in part.lots) < part.qty]
 if len(neverenough):
-    print "\nNote: with current settings for finding vendors, you will ***NEVER***"
-    print "be able to find enough of",
+    print("\nNote: with current settings for finding vendors, you will ***NEVER***")
+    print("be able to find enough of", end=" ")
     for n in neverenough:
-        print n.code, ",",
-    print "\nConsider ordering these in different colours."
+        print(n.code, ",", end=" ")
+    print("\nConsider ordering these in different colours.")
 
 for n in neverenough:
     optimize_parts.remove(n)
@@ -78,7 +79,7 @@ for part in optimize_parts:
 
 t_end = datetime.datetime.now() + datetime.timedelta(seconds = args.timeout)
 if not args.quiet:
-	print "Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute)
+	print("Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute))
 j = 0
 i = 0
 vendorwarning_given = False
@@ -124,11 +125,11 @@ while (time.time() < endat):
         howmany_close_big = ran.randint(1, howmany_vendors/2+1)
         howmany_close = howmany_vendors - howmany_close_big - howmany_far
     except NameError:
-        print "NameError (in choosing random values)!"
+        print("NameError (in choosing random values)!")
         break
     except ValueError:
         if not vendorwarning_given:
-            print "ValueError -- consider increasing the maximum vendor parameter"
+            print("ValueError -- consider increasing the maximum vendor parameter")
             vendorwarning_given = True
         continue
     except:
@@ -139,7 +140,7 @@ while (time.time() < endat):
         + ran.sample(vendors_far, howmany_far)))
         available_parts = list(set(reduce(lambda a, b: a + b, (vendor.stock_parts for vendor in try_vendors))))
     except NameError:
-        print "NameError (in choosing random vendors)!"
+        print("NameError (in choosing random vendors)!")
         break
     except:
         continue
@@ -156,57 +157,56 @@ while (time.time() < endat):
 
     j += 1
     if not args.quiet:
-        print j, order #printing the orders does not significantly slow the loop down
+        print(j, order) #printing the orders does not significantly slow the loop down
     orders.append(order)
 
     if len(orders) == 400: # to conserve memory, we remove bad orders
         if not args.quiet:
-            print "Trimming list of orders..."
+            print("Trimming list of orders...")
         orders.sort()
         orders = orders[:50]
 
     if not j%20000:
         if not args.quiet:
-            print "Removing duplicates..."
+            print("Removing duplicates...")
         orders.sort()
         orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
 
 if not args.quiet:
-	print ""
-	print "Finished optimalisation"
+	print("\nFinished optimalisation")
 orders.sort()
 orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
 orders = orders[:50]
 if not args.quiet:
-	print "Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1) , "% )"
-	print "in", args.timeout/60., "minutes"
+	print("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1) , "% )")
+	print("in", args.timeout/60., "minutes")
 
 try:
 	best = orders[0]
 	if not args.quiet:
-		print "Best:", best
+		print("Best:", best)
 except IndexError:
-    print "Did not find any orders!"
-    print "Consider changing the maxvendors and/or timeout parameters."
+    print("Did not find any orders!")
+    print("Consider changing the maxvendors and/or timeout parameters.")
 
 if len(notenough):
-    print "\nNote: with current settings for finding vendors, you cannot order a full lot of:"
+    print("\nNote: with current settings for finding vendors, you cannot order a full lot of:")
     for n in notenough:
-        print n.code, ","
-    print "\nConsider ordering these in different colours."
+        print(n.code, ",")
+    print("\nConsider ordering these in different colours.")
 
 if len(neverenough):
-    print "\nNote: with current settings for finding vendors, you will ***NEVER*** be able to find enough of:"
+    print("\nNote: with current settings for finding vendors, you will ***NEVER*** be able to find enough of:")
     for n in neverenough:
-        print n.code, ",",
-    print "\nConsider ordering these in different colours."
+        print(n.code, ",", end=" ")
+    print("\nConsider ordering these in different colours.")
 
 if not args.quiet:
-	print "The following parts have the fewest available lots:"
+	print("The following parts have the fewest available lots:")
 	for part in optimize_parts[:10]:
-		print part.code, "({0})".format(len(part.lots)),
+		print(part.code, "({0})".format(len(part.lots)), end=" ")
 
 if len(orders) > 0:
 	if not args.quiet:
-		print "\nSaving best order to file:", args.save_to
+		print("\nSaving best order to file:", args.save_to)
 	orders[0].save(args.save_to)
