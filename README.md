@@ -6,7 +6,10 @@ PyBrick is a Python module that allows optimisation of large orders on [BrickLin
 
 For inexperienced users, it is suggested to use the *main.py* script to do the optimisation. Usage of this script will be further explained later in this paragraph. Advanced users may prefer to directly use the functions and classes present in the PyBrick module, by importing it: `import PyBrick`. This paragraph will focus only on usage of the *main.py* script.
 
-The installation of PyBrick is very simple: simply clone or copy the files in this repository to your computer. PyBrick works for Python versions 2.7 and 3+. Some additional Python modules are also required; if these are not present, simply install these, for example with [pip](https://pypi.python.org/pypi/pip).
+The installation of PyBrick is very simple: simply clone or copy the files in this repository to your computer. PyBrick works for Python versions 2.7 and 3+. Some additional Python modules are also required; if these are not present, simply install these, for example with [pip](https://pypi.python.org/pypi/pip). The required modules are:
+
+* requests
+* bs4
 
 The script is called from the command line as follows:
 
