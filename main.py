@@ -71,10 +71,10 @@ for n in neverenough:
 
 notenough = []
 for part in optimize_parts:
-	if part.enough():
-		continue
-	optimize_parts.remove(part)
-	notenough.append(part)
+    if part.enough():
+        continue
+    optimize_parts.remove(part)
+    notenough.append(part)
 
 t_end = datetime.datetime.now() + datetime.timedelta(seconds = args.timeout)
 verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute))
@@ -165,8 +165,8 @@ verboseprint("Found", j, "valid orders ( out of", i, "attempts -", round(float(j
 verboseprint("in", args.timeout/60., "minutes")
 
 try:
-	best = orders[0]
-	verboseprint("Best:", best)
+    best = orders[0]
+    verboseprint("Best:", best)
 except IndexError:
     print("Did not find any orders!")
     print("Consider changing the maxvendors and/or timeout parameters.")

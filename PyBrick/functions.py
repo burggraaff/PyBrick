@@ -67,11 +67,11 @@ def read_bsx_files(fileloc):
     return r
 
 def parse_bsx_filename_input(arg):
-	if ".bsx" in arg: # single bsx file:
-		return [arg]
-	else:
-		return read_bsx_files(arg)
-	
+    if ".bsx" in arg: # single bsx file:
+        return [arg]
+    else:
+        return read_bsx_files(arg)
+
 def read_bricks(files, nr = -1, verboseprint = print):
     """
     Parse a list of BSX files into a list of Brick objects
