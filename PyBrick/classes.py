@@ -93,7 +93,7 @@ class Lot(object):
         self.qty = qty
         self.step = step
         self.nr = lotnr
-        self.URL = self.vendor.URL + '#/shop?o={"q":"' + self.nr + '"}'
+        self.URL = self.vendor.URL + '#/shop?o={{"showHomeItems":0,"q":"{nr}"}}'.format(nr=self.nr)
         minqty = min(self.qty, self.part.qty)
         self.order_amount = self.step * (minqty//self.step + (minqty%self.step > 0))
         self.price_total = round(self.order_amount * self.price, 2)
