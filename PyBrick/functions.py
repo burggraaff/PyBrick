@@ -4,7 +4,7 @@ Olivier Burggraaff
 
 Function definitions
 """
-from __future__ import print_function
+from __future__ import print_function, division
 from . import classes as c
 import xml.etree.ElementTree as ET
 import requests

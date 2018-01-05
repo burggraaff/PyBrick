@@ -4,7 +4,7 @@ Olivier Burggraaff
 
 Class definitions
 """
-from __future__ import print_function
+from __future__ import print_function, division
 import xml.etree.ElementTree as ET
 try:
     from urllib import urlencode #  python2
@@ -95,7 +95,7 @@ class Lot(object):
         self.nr = lotnr
         self.URL = self.vendor.URL + '#/shop?o={"q":"' + self.nr + '"}'
         minqty = min(self.qty, self.part.qty)
-        self.order_amount = self.step * (minqty/self.step + (minqty%self.step > 0))
+        self.order_amount = self.step * (minqty//self.step + (minqty%self.step > 0))
         self.price_total = round(self.order_amount * self.price, 2)
     def __repr__(self):
         return "E"+str(self.price_total)+" for "+self.part.code+" at "+self.vendor.storename.encode("ascii", "replace")+" ("+self.vendor.loc+")"
