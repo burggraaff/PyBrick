@@ -13,9 +13,9 @@ import random as ran
 import ssl
 
 try:
-    reduce = reduce #  python 2
+    reduce = reduce  # python 2
 except NameError:
-    from functools import reduce #  python 3
+    from functools import reduce  # python 3
 
 try:
     _create_unverified_https_context = ssl._create_unverified_context
@@ -26,9 +26,10 @@ else:
     # Handle target environment that doesn't support HTTPS verification
     ssl._create_default_https_context = _create_unverified_https_context
 
+
 def read_settings(args):
     regions = ["None", "Asia", "Africa", "North America", "South America", "Middle East", "Europe", "Australia & Oceania"]
-    x = open(args.settings_file, mode = 'r')
+    x = open(args.settings_file, mode='r')
     lines = x.readlines()
     s = [line.split('#')[0].strip().split(":") for line in lines]
     k = {s_el[0].strip(): s_el[1].strip() for s_el in s}
@@ -43,6 +44,7 @@ def read_settings(args):
 
     return k
 
+
 def read_bsx_files(fileloc):
     x = open(fileloc, mode="r")
     lines = x.readlines()
@@ -53,13 +55,15 @@ def read_bsx_files(fileloc):
     r = [el if ("." in el) else el+".bsx" for el in r]
     return r
 
+
 def parse_bsx_filename_input(arg):
-    if ".bsx" in arg: # single bsx file:
+    if ".bsx" in arg:  # single bsx file:
         return [arg]
     else:
         return read_bsx_files(arg)
 
-def read_bricks(files, nr = -1, verboseprint = print):
+
+def read_bricks(files, nr=-1, verboseprint=print):
     """
     Parse a list of BSX files into a list of Brick objects
 
@@ -69,8 +73,8 @@ def read_bricks(files, nr = -1, verboseprint = print):
         List (or other iterable) of files to parse
     nr: int, optional
         Return only the first nr bricks (-1 if all)
-		This is for debugging
-		Default: -1
+        This is for debugging
+        Default: -1
     verboseprint: function
         Function to print with
         Default: print
@@ -95,11 +99,11 @@ def read_bricks(files, nr = -1, verboseprint = print):
         bricks_new = [c.Brick(item) for item in inventory.getchildren()]
 
         for part in bricks_new:
-            try: # if we already know about this brick, add the quantity
+            try:  # if we already know about this brick, add the quantity
                 ind = known_parts.index(part.code)
                 allbricks_[ind] += part
                 verboseprint("Found duplicate:", part.code)
-            except ValueError: # if the brick is unknown, add it to the list
+            except ValueError:  # if the brick is unknown, add it to the list
                 allbricks_.append(part)
 
     allbricks_.sort(key=lambda part: -part.qty)
@@ -111,6 +115,7 @@ def read_bricks(files, nr = -1, verboseprint = print):
     else:
         return allbricks_
 
+
 def prepare_bricks(allbricks):
     optimize_parts = list(allbricks)
     optimize_parts.sort(key=lambda part: len(part.lots))
@@ -118,11 +123,14 @@ def prepare_bricks(allbricks):
         part.sort_lots()
         return optimize_parts
 
+
 def find_vendor_name(tdtag):
     return tdtag.findAll("a")[1].text
 
+
 def find_vendor_storename(tdtag):
     return tdtag.findAll("a")[1].attrs["href"].split("&")[0].split("=")[1]
+
 
 def parse_vendor(fonttag, tdtag, settings):
     name = find_vendor_name(tdtag)
@@ -133,7 +141,7 @@ def parse_vendor(fonttag, tdtag, settings):
     if "EUR" in font_[1]:
         try:
             minbuy = float(font_[1][5:])
-        except:
+        except ValueError:
             minbuy = 0.0
     else:
         minbuy = 0.0
@@ -141,6 +149,7 @@ def parse_vendor(fonttag, tdtag, settings):
     linktag = tdtag.findAll("a")[1]
     storename = linktag.attrs["href"].split("&")[0].split("=")[1]
     return c.Vendor(name, storename, loc, minbuy, settings)
+
 
 def parse_lot(part, tdtag, vendor):
     price1 = tdtag.find("font", attrs={"face": "Verdana", "size": "-2"}).text
@@ -158,7 +167,8 @@ def parse_lot(part, tdtag, vendor):
     lotnr = tdtag.findAll("a")[1].attrs["href"].split("=")[-1]
     return c.Lot(part, vendor, price, qty, step, lotnr)
 
-def read_vendors(allbricks, settings, verboseprint = print):
+
+def read_vendors(allbricks, settings, verboseprint=print):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
 
@@ -179,8 +189,8 @@ def read_vendors(allbricks, settings, verboseprint = print):
         Dictionary with {vendor_name: Vendor_object}
     """
     vendors = {}
-    params_init = {"itemType": "P", "sellerLoc": "R", "regionID": settings["regionID"],\
-        "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],\
+    params_init = {"itemType": "P", "sellerLoc": "R", "regionID": settings["regionID"],
+        "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],
         "searchSort": "Q", "pg": "1", "pmt": "18"}
     verboseprint("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
     try:
@@ -216,18 +226,20 @@ def read_vendors(allbricks, settings, verboseprint = print):
     try:
         for vendor in vendors.values():
             if sum(lot.price_total for lot in vendor.stock) < vendor.minbuy:
-                del vendor # remove vendors you can never buy from
+                del vendor  # remove vendors you can never buy from
     except Exception as e:
         raise e
 
     return vendors
 
+
 def cheapest_lot(part, vendors):
     available_lots = [lot for lot in part.lots if lot.vendor in vendors]
-    available_lots.sort(key = lambda lot: lot.price_total)
+    available_lots.sort(key=lambda lot: lot.price_total)
     return available_lots[0]
 
-def vendors_of_rare_bricks(bricks, N = None):
+
+def vendors_of_rare_bricks(bricks, N=None):
     if N is None:
         N = len(bricks) // 25
     return list(set(ran.choice(part.vendors) for part in bricks[:N] if part.enough()))
