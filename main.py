@@ -48,8 +48,9 @@ for part in allbricks:
         lots_always.append(part.lots[0])
         optimize_parts.remove(part)
 
-vendors_close = filter(lambda vendor: vendor.close(settings), vendors.values())
-vendors_far = filter(lambda vendor: not vendor.close(settings), vendors.values())
+vendors_close = [vendor for vendor in vendors.values() if vendor.close(settings)] 
+vendors_far = [vendor for vendor in vendors.values() if not vendor.close(settings)] 
+
 for l in (vendors_close, vendors_far):
     l.sort(key = lambda vendor: -len(vendor.stock_parts))
 vendors_always = [lot.vendor for lot in lots_always]
