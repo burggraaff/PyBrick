@@ -6,7 +6,10 @@ Class definitions
 """
 from __future__ import print_function
 import xml.etree.ElementTree as ET
-import urllib
+try:
+    from urllib import urlencode #  python2
+except:
+    from urllib.parse import urlencode #  python3
 
 class Brick(object):
     """
@@ -52,7 +55,7 @@ class Brick(object):
         return any(lot.qty >= self.qty for lot in self.lots)
     def URL(self, settings):
         params_main = dict({"invNew": self.Condition, "q": self.ItemID, "qMin": self.qty, "colorID": self.ColorID}, **settings)
-        data = urllib.urlencode(params_main)
+        data = urlencode(params_main)
         URL = "http://www.bricklink.com/search.asp?"+data
         return URL
     def __iadd__(self, other):
