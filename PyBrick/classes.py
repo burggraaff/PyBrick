@@ -14,21 +14,37 @@ except ImportError:
 
 class Brick(object):
     """
-    This class represents a unique LEGO brick, defined with an ItemID
-    (which brick) and a ColorID (which colour).
+    This class represents a unique LEGO brick, defined with an itemID
+    (which brick) and a colorID (which colour).
     """
-    def __init__(self, item):
+    def __init__(self, itemID, colorID, qty=0, condition="",
+                 itemname="itemName?", colourname="colourName?", **attributes):
+        self.itemID = itemID
+        self.colorID = colorID
+        self.qty = qty
+        self.condition = condition
+        self.itemname = itemname
+        self.colourname = colourname
+        self.code = self.itemID + "|" + self.colorID
+        for attr in attributes:
+            setattr(self, attr, attributes[attr])
+        self.vendors = []
+        self.lots = []
+
+    @classmethod
+    def fromXML(cls, item):
         """
         Create a Brick object from an XML item
         """
-        assert isinstance(item, ET.Element), "Did not get XML item to create Brick object; instead got "+str(type(item))
         asdict = {b.tag: b.text for b in item.getchildren()}
-        for key in asdict:
-            setattr(self, key, asdict[key])
-        self.qty = int(self.Qty) ; del self.Qty
-        self.code = self.ItemID+"|"+self.ColorID
-        self.vendors = []
-        self.lots = []
+        itemID = asdict.pop("ItemID")
+        colorID = asdict.pop("ColorID")
+        qty = int(asdict.pop("Qty"))
+        condition = asdict.pop("Condition", "")
+        itemname = asdict.pop("ItemName", "itemName?")
+        colourname = asdict.pop("ColorName", "colourName?")
+        return cls(itemID, colorID, qty=qty, condition=condition,
+                   itemname=itemname, colourname=colourname, **asdict)
 
     def add_vendor(self, vendor):
         """
@@ -52,7 +68,7 @@ class Brick(object):
         """
         Sort the lots of this brick from cheapest to most expensive
         """
-        self.lots.sort(key = lambda lot: lot.price_total)
+        self.lots.sort(key=lambda lot: lot.price_total)
 
     def enough(self):
         """
@@ -61,8 +77,10 @@ class Brick(object):
         return any(lot.qty >= self.qty for lot in self.lots)
 
     def URL(self, settings):
-        params_main = dict({"invNew": self.Condition, "q": self.ItemID, "qMin": self.qty, "colorID": self.ColorID}, **settings)
-        data = urlencode(params_main)
+        params = {"invNew": self.condition, "q": self.itemID, "qMin": self.qty,
+                  "colorID": self.colorID}
+        params.update(settings)
+        data = urlencode(params)
         URL = "http://www.bricklink.com/search.asp?"+data
         return URL
 
@@ -90,9 +108,10 @@ class Brick(object):
 
     def __repr__(self):
         line = "----------"
-        properties = reduce(lambda x,y:x+y, ["\n"+key+": "+str(self.__dict__[key]) for key in ["code", "ItemName", "ColorName", "qty", "Condition"]])
-        vendorline = "\n# Vendors: "+str(self.nrvendors())
-        return line+properties+vendorline+"\n"+line
+        properties = "\n".join([self.code, self.itemname, self.colourname,
+                                self.condition, str(self.qty)])
+        vendorline = "{v} vendors".format(v=self.nrvendors())
+        return "\n".join([line, properties, vendorline, line])
 
 
 class Lot(object):

@@ -96,7 +96,7 @@ def read_bricks(files, nr=-1, verboseprint=print):
         tree = ET.parse(bsx)
         root = tree.getroot()
         inventory = root[0]
-        bricks_new = [c.Brick(item) for item in inventory.getchildren()]
+        bricks_new = [c.Brick.fromXML(item) for item in inventory.getchildren()]
 
         for part in bricks_new:
             try:  # if we already know about this brick, add the quantity

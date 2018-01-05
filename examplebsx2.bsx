@@ -14,7 +14,6 @@
    <Status>I</Status>
    <Qty>52</Qty>
    <Price>0.000</Price>
-   <Condition>N</Condition>
    <OrigQty>0</OrigQty>
   </Item>
   <Item>
@@ -28,36 +27,6 @@
    <CategoryName>Plate</CategoryName>
    <Status>I</Status>
    <Qty>26</Qty>
-   <Price>0.000</Price>
-   <Condition>N</Condition>
-   <OrigQty>0</OrigQty>
-  </Item>
-  <Item>
-   <ItemID>30503</ItemID>
-   <ItemTypeID>P</ItemTypeID>
-   <ColorID>86</ColorID>
-   <ItemName>Wedge, Plate 4 x 4 Cut Corner</ItemName>
-   <ItemTypeName>Part</ItemTypeName>
-   <ColorName>Light Bluish Gray</ColorName>
-   <CategoryID>583</CategoryID>
-   <CategoryName>Wedge, Plate</CategoryName>
-   <Status>I</Status>
-   <Qty>58</Qty>
-   <Price>0.000</Price>
-   <Condition>N</Condition>
-   <OrigQty>0</OrigQty>
-  </Item>
-  <Item>
-   <ItemID>3029</ItemID>
-   <ItemTypeID>P</ItemTypeID>
-   <ColorID>85</ColorID>
-   <ItemName>Plate 4 x 12</ItemName>
-   <ItemTypeName>Part</ItemTypeName>
-   <ColorName>Dark Bluish Gray</ColorName>
-   <CategoryID>26</CategoryID>
-   <CategoryName>Plate</CategoryName>
-   <Status>I</Status>
-   <Qty>20</Qty>
    <Price>0.000</Price>
    <Condition>N</Condition>
    <OrigQty>0</OrigQty>
