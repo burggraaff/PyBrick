@@ -13,6 +13,11 @@ import random as ran
 import ssl
 
 try:
+    reduce = reduce #  python 2
+except NameError:
+    from functools import reduce #  python 3
+
+try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
     # Legacy Python that doesn't verify HTTPS certificates by default

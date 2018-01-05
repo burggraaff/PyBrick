@@ -7,6 +7,7 @@ Main script
 from __future__ import print_function
 
 from PyBrick import classes as c, functions as f
+from PyBrick.functions import reduce
 from argparse import ArgumentParser
 import time
 import datetime
@@ -121,26 +122,16 @@ while (time.time() < endat):
         howmany_far = 0 if settings["harsh"] else ran.randint(0, int(howmany_vendors/7))
         howmany_close_big = ran.randint(1, howmany_vendors/2+1)
         howmany_close = howmany_vendors - howmany_close_big - howmany_far
-    except NameError:
-        print("NameError (in choosing random values)!")
-        break
-    except ValueError:
+    except ValueError as e:
         if not vendorwarning_given:
             print("ValueError -- consider increasing the maximum vendor parameter")
             vendorwarning_given = True
+            print(e)
         continue
-    except:
-        continue
-    try:
-        try_vendors = list(set(vendors_always + vendors_notenough + vendors_rare \
-        + ran.sample(vendors_close_big, howmany_close_big) + ran.sample(vendors_close, howmany_close) \
-        + ran.sample(vendors_far, howmany_far)))
-        available_parts = list(set(reduce(lambda a, b: a + b, (vendor.stock_parts for vendor in try_vendors))))
-    except NameError:
-        print("NameError (in choosing random vendors)!")
-        break
-    except:
-        continue
+    try_vendors = list(set(vendors_always + vendors_notenough + vendors_rare \
+    + ran.sample(vendors_close_big, howmany_close_big) + ran.sample(vendors_close, howmany_close) \
+    + ran.sample(vendors_far, howmany_far)))
+    available_parts = list(set(reduce(lambda a, b: a + b, (vendor.stock_parts for vendor in try_vendors))))
     if not all(part in available_parts for part in allbricks):
         continue
 

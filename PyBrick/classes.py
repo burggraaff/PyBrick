@@ -135,7 +135,7 @@ class Order(object):
         self.score = round(self.totalprice() + settings["weight_close"] * len(self.vendors) +settings["weight_far"] * len([v for v in self.vendors if not v.close(settings)]), 3)
     def give_URLs(self):
         URLs = sorted([lot.URL+" | "+str(lot.order_amount)+"\n" for lot in self.lots])
-        URLstring = reduce(lambda a, b: a + b, URLs)[:-1] #[:-1] to remove trailing \n
+        URLstring = "".join(URLs)[:-1] #[:-1] to remove trailing \n
         return URLstring
     def save(self, filename="a.order"):
         string = self.give_URLs()
