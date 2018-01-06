@@ -23,11 +23,10 @@ parser.add_argument("-q", "--quiet", action = "store_true")
 args = parser.parse_args()
 args.timeout *= 60.
 
-settings = f.read_settings(args)
-
 # print if not quiet, else do nothing
 verboseprint = print if not args.quiet else lambda *args, **kwargs: None
 
+settings = f.read_settings(args)
 verboseprint("Read settings from {0}".format(args.settings_file))
 
 bsx_files = f.parse_bsx_filename_input(args.bsx_list)
@@ -36,9 +35,8 @@ verboseprint("Read BSX filenames from {0}".format(args.bsx_list))
 allbricks = f.read_bricks(bsx_files, verboseprint=verboseprint)
 verboseprint("Made list of {0} types of bricks".format(len(allbricks)))
 
-vendortime = time.time()
 vendors = f.read_vendors(allbricks, settings, verboseprint=verboseprint)
-verboseprint("Made list of vendors;", len(vendors), "(", round(time.time() - vendortime, 2), ")")
+verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 
 optimize_parts = f.prepare_bricks(allbricks)
 
@@ -49,8 +47,8 @@ for part in allbricks:
         lots_always.append(part.lots[0])
         optimize_parts.remove(part)
 
-vendors_close = [vendor for vendor in vendors.values() if vendor.close(settings)] 
-vendors_far = [vendor for vendor in vendors.values() if not vendor.close(settings)] 
+vendors_close = [vendor for vendor in vendors.values() if vendor.close(settings)]
+vendors_far = [vendor for vendor in vendors.values() if not vendor.close(settings)]
 
 for l in (vendors_close, vendors_far):
     l.sort(key = lambda vendor: -len(vendor.stock_parts))
