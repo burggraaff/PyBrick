@@ -224,7 +224,9 @@ def read_vendors(allbricks, settings, verboseprint=print):
         qtylinkprice = htmlsoup.findAll("td", {"valign": "TOP"})
         locminbuy = htmlsoup.findAll("font", {"color": r"#606060"})
         for l, q in zip(locminbuy, qtylinkprice):
-            new_vendor = Vendor.fromHTML(l, q, settings)
+            new_vendor = Vendor.fromHTML(l, q, preferred=settings["preferred_countries"])
+            if settings["harsh"] and new_vendor.loc not in settings["preferred_countries"]:
+                continue
             new_name = new_vendor.storename
             if new_name not in vendors:
                 vendors[new_name] = new_vendor

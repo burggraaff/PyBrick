@@ -132,11 +132,9 @@ class Lot(object):
 
 
 class Vendor(object):
-    def __init__(self, name, storename, loc, minbuy, settings):
+    def __init__(self, name, storename, loc, minbuy, preferred=[]):
         self.loc = loc
-        self.close = self.loc not in settings["preferred_countries"]
-        if settings["harsh"] and not self.close:
-            raise ValueError("Vendor not close")
+        self.close = self.loc in preferred
         self.minbuy = minbuy
         self.name = name
         self.storename = storename
@@ -145,12 +143,10 @@ class Vendor(object):
         self.stock_parts = []
 
     @classmethod
-    def fromHTML(cls, font, td, settings):
+    def fromHTML(cls, font, td, **kwargs):
         name = td.findAll("a")[1].text
         font_ = font.text.split("Min Buy: ")
         loc = font_[0][5:][:-2]
-        if settings["harsh"] and (loc not in settings["close_countries"]):
-            raise ValueError("Vendor not close")
         if "EUR" in font_[1]:
             try:
                 minbuy = float(font_[1][5:])
@@ -161,7 +157,7 @@ class Vendor(object):
         storename = td.findAll("a")[1].attrs["href"].split("&")[0].split("=")[1]
         linktag = td.findAll("a")[1]
         storename = linktag.attrs["href"].split("&")[0].split("=")[1]
-        return cls(name, storename, loc, minbuy, settings)
+        return cls(name, storename, loc, minbuy, **kwargs)
 
     def add_lot(self, lot):
         self.stock.append(lot)
