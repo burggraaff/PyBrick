@@ -6,8 +6,7 @@ Main script
 """
 from __future__ import print_function
 
-from PyBrick import classes as c, functions as f
-from PyBrick.functions import reduce
+from PyBrick import functions as f
 from argparse import ArgumentParser
 
 parser = ArgumentParser()
