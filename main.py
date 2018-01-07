@@ -30,7 +30,6 @@ parser.add_argument("-H", "--harsh", action="store_true", help="If True, only\
                     use vendors from preferred countries")
 parser.add_argument("-q", "--quiet", action="store_true")
 args = parser.parse_args()
-args.timeout *= 60.
 
 # print if not quiet, else do nothing
 verboseprint = print if not args.quiet else lambda *args, **kwargs: None

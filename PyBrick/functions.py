@@ -255,8 +255,8 @@ def _trim_orders(order_list, limit=50):
 def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                vendors_close, vendors_far, notenough,
                max_vendors=10, harsh=False, weight=20, w_far=150,
-               verboseprint=print, timeout=600.):
-    t_end = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
+               verboseprint=print, timeout=10.):
+    t_end = datetime.datetime.now() + datetime.timedelta(minutes=timeout)
     verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}"
                  .format(t_end.hour, t_end.minute))
     i = j = 0
@@ -334,7 +334,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
     orders = sorted(orders)
     verboseprint("Found", j, "valid orders ( out of", i, "attempts -",
                  round(float(j)/i * 100, 1), "% )")
-    verboseprint("in", timeout/60., "minutes")
+    verboseprint("in", timeout, "minutes")
 
     try:
         best = orders[0]
