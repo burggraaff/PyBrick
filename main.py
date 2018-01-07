@@ -43,23 +43,7 @@ optimize_parts, lots_always = f.prepare_bricks(allbricks)
 vendors_always, vendors_close_big, vendors_close, vendors_far = \
     f.divide_vendors(vendors, lots_always, settings)
 
-neverenough = [part for part in allbricks if sum(lot.qty for lot in part.lots) < part.qty]
-if len(neverenough):
-    print("\nNote: with current settings for finding vendors, you will ***NEVER***")
-    print("be able to find enough of", end=" ")
-    for n in neverenough:
-        print(n.code, ",", end=" ")
-    print("\nConsider ordering these in different colours.")
-
-for n in neverenough:
-    optimize_parts.remove(n)
-
-notenough = []
-for part in optimize_parts:
-    if part.enough():
-        continue
-    optimize_parts.remove(part)
-    notenough.append(part)
+optimize_parts, notenough = f.check_enough(optimize_parts)
 
 t_end = datetime.datetime.now() + datetime.timedelta(seconds = args.timeout)
 verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute))
@@ -160,12 +144,6 @@ if len(notenough):
     print("\nNote: with current settings for finding vendors, you cannot order a full lot of:")
     for n in notenough:
         print(n.code, ",")
-    print("\nConsider ordering these in different colours.")
-
-if len(neverenough):
-    print("\nNote: with current settings for finding vendors, you will ***NEVER*** be able to find enough of:")
-    for n in neverenough:
-        print(n.code, ",", end=" ")
     print("\nConsider ordering these in different colours.")
 
 verboseprint("The following parts have the fewest available lots:")

@@ -138,6 +138,24 @@ def prepare_bricks(allbricks):
     return optimize_parts, lots_always
 
 
+def check_enough(bricks):
+    parts = list(bricks)  # copy
+    never = [part for part in parts if sum(lot.qty for lot in part.lots) <
+             part.qty]
+    if len(never):
+        raise ValueError("You will NEVER be able to order sufficient parts of \
+                         the following bricks with current settings. Consider \
+                         ordering these in different colours:\n \
+                         {never}".format(never))
+    notenough = []
+    for part in parts:
+        if not part.enough():
+            parts.remove(part)
+            notenough.append(part)
+
+    return parts, notenough
+
+
 def divide_vendors(vendors, lots_always, settings):
     close = [vendor for vendor in vendors.values() if vendor.close(settings)]
     far = [vendor for vendor in vendors.values() if not vendor.close(settings)]
