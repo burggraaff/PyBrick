@@ -167,7 +167,8 @@ def divide_vendors(vendors, lots_always):
     return always, close_big, close, far
 
 
-def read_vendors(allbricks, settings, harsh=False, verboseprint=print):
+def read_vendors(allbricks, settings, len_vendors=250, harsh=False,
+                 verboseprint=print):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
 
@@ -189,7 +190,7 @@ def read_vendors(allbricks, settings, harsh=False, verboseprint=print):
     """
     vendors = {}
     params_init = {"itemType": "P", "sellerLoc": "R", "regionID": settings["regionID"],
-        "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],
+        "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": len_vendors,
         "searchSort": "Q", "pg": "1", "pmt": "18"}
     verboseprint("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
     for j, part in enumerate(allbricks):

@@ -20,6 +20,8 @@ parser.add_argument("-t", "--timeout", help="How many minutes to optimise for",
                     type=float, default=10.0)
 parser.add_argument("-m", "--max_vendors", help="Maximum number of vendors to\
                     use", type=int, default=10)
+parser.add_argument("-l", "--len_vendors", help="Number of vendors per brick\
+                    to fetch from Bricklink per brick", type=int, default=250)
 parser.add_argument("-H", "--harsh", action="store_true", help="If True, only\
                     use vendors from preferred countries")
 parser.add_argument("-q", "--quiet", action="store_true")
@@ -39,7 +41,7 @@ allbricks = f.read_bricks(bsx_files, verboseprint=verboseprint)
 verboseprint("Made list of {0} types of bricks".format(len(allbricks)))
 
 vendors = f.read_vendors(allbricks, settings, harsh=args.harsh,
-                         verboseprint=verboseprint)
+                         verboseprint=verboseprint, len_vendors=args.len_vendors)
 verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 
 optimize_parts, lots_always = f.prepare_bricks(allbricks)
