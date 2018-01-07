@@ -5,7 +5,7 @@ Olivier Burggraaff
 Function definitions
 """
 from __future__ import print_function, division
-from . import classes as c
+from .classes import Brick, Vendor, Lot, Order
 import xml.etree.ElementTree as ET
 import requests
 from bs4 import BeautifulSoup as soup
@@ -98,7 +98,7 @@ def read_bricks(files, nr=-1, verboseprint=print):
         tree = ET.parse(bsx)
         root = tree.getroot()
         inventory = root[0]
-        bricks_new = [c.Brick.fromXML(item) for item in inventory.getchildren()]
+        bricks_new = [Brick.fromXML(item) for item in inventory.getchildren()]
 
         for part in bricks_new:
             try:  # if we already know about this brick, add the quantity
@@ -192,7 +192,7 @@ def parse_vendor(fonttag, tdtag, settings):
     storename = find_vendor_storename(tdtag)
     linktag = tdtag.findAll("a")[1]
     storename = linktag.attrs["href"].split("&")[0].split("=")[1]
-    return c.Vendor(name, storename, loc, minbuy, settings)
+    return Vendor(name, storename, loc, minbuy, settings)
 
 
 def parse_lot(part, tdtag, vendor):
@@ -209,7 +209,7 @@ def parse_lot(part, tdtag, vendor):
     else:
         step = 1
     lotnr = tdtag.findAll("a")[1].attrs["href"].split("=")[-1]
-    return c.Lot(part, vendor, price, qty, step, lotnr)
+    return Lot(part, vendor, price, qty, step, lotnr)
 
 
 def read_vendors(allbricks, settings, verboseprint=print):
@@ -360,7 +360,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
 
         lots = lots_always + lots_notenough + [cheapest_lot(part, try_vendors) for part in optimize_parts]
 
-        order = c.Order(lots, w_close, w_far)
+        order = Order(lots, w_close, w_far)
         if len(order.vendors) > max_vendors:
             continue
         if not order.valid_minbuy():
