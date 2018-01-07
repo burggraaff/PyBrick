@@ -20,6 +20,8 @@ parser.add_argument("-t", "--timeout", help="How many minutes to optimise for",
                     type=float, default=10.0)
 parser.add_argument("-m", "--max_vendors", help="Maximum number of vendors to\
                     use", type=int, default=10)
+parser.add_argument("-H", "--harsh", action="store_true", help="If True, only\
+                    use vendors from preferred countries")
 parser.add_argument("-q", "--quiet", action="store_true")
 args = parser.parse_args()
 args.timeout *= 60.
@@ -36,7 +38,8 @@ verboseprint("Read BSX filenames from {0}".format(args.bsx_list))
 allbricks = f.read_bricks(bsx_files, verboseprint=verboseprint)
 verboseprint("Made list of {0} types of bricks".format(len(allbricks)))
 
-vendors = f.read_vendors(allbricks, settings, verboseprint=verboseprint)
+vendors = f.read_vendors(allbricks, settings, harsh=args.harsh,
+                         verboseprint=verboseprint)
 verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 
 optimize_parts, lots_always = f.prepare_bricks(allbricks)
@@ -49,8 +52,7 @@ optimize_parts, notenough = f.check_enough(optimize_parts)
 best_order = f.find_order(optimize_parts, lots_always, vendors_always,
                           vendors_close_big, vendors_close, vendors_far,
                           notenough, max_vendors=args.max_vendors,
-                          harsh=settings["harsh"],
-                          w_close=settings["weight_close"],
+                          harsh=args.harsh, w_close=settings["weight_close"],
                           w_far=settings["weight_far"],
                           verboseprint=verboseprint, timeout=args.timeout)
 

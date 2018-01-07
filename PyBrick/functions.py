@@ -36,7 +36,6 @@ def read_settings(args):
     s = [line.split('#')[0].strip().split(":") for line in lines]
     k = {s_el[0].strip(): s_el[1].strip() for s_el in s}
     k["preferred_countries"] = [country.strip() for country in k["preferred_countries"].split(",")]
-    k["harsh"] = (k["harsh"] == "1")
     k["weight_close"] = float(k["weight_close"])
     k["weight_far"] = float(k["weight_far"])
     if len(k["preferred_countries"]) == 0:
@@ -168,7 +167,7 @@ def divide_vendors(vendors, lots_always):
     return always, close_big, close, far
 
 
-def read_vendors(allbricks, settings, verboseprint=print):
+def read_vendors(allbricks, settings, harsh=False, verboseprint=print):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
 
@@ -208,7 +207,7 @@ def read_vendors(allbricks, settings, verboseprint=print):
         locminbuy = htmlsoup.findAll("font", {"color": r"#606060"})
         for l, q in zip(locminbuy, qtylinkprice):
             new_vendor = Vendor.fromHTML(l, q, preferred=settings["preferred_countries"])
-            if settings["harsh"] and new_vendor.loc not in settings["preferred_countries"]:
+            if harsh and new_vendor.loc not in settings["preferred_countries"]:
                 continue
             new_name = new_vendor.storename
             if new_name not in vendors:
