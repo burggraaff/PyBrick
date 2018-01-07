@@ -272,8 +272,8 @@ def find_max_vendors(optimize_parts, lots_always, vendors_always,
                                       verboseprint=do_nothing, **kwargs)
             results[i] = len(orders)
         except Exception as e:
-            print(e)
             continue
+        print(i, best.score, len(best.vendors), len(orders))
     return results
 
 
