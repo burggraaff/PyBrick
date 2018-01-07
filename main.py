@@ -40,8 +40,7 @@ verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 
 optimize_parts, lots_always = f.prepare_bricks(allbricks)
 
-vendors_close = [vendor for vendor in vendors.values() if vendor.close(settings)]
-vendors_far = [vendor for vendor in vendors.values() if not vendor.close(settings)]
+vendors_close, vendors_far = f.divide_vendors(vendors, settings)
 
 for l in (vendors_close, vendors_far):
     l.sort(key = lambda vendor: -len(vendor.stock_parts))

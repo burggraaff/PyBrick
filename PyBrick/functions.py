@@ -138,6 +138,12 @@ def prepare_bricks(allbricks):
     return optimize_parts, lots_always
 
 
+def divide_vendors(vendors, settings):
+    close = [vendor for vendor in vendors.values() if vendor.close(settings)]
+    far = [vendor for vendor in vendors.values() if not vendor.close(settings)]
+    return close, far
+
+
 def find_vendor_name(tdtag):
     return tdtag.findAll("a")[1].text
 
