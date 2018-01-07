@@ -363,7 +363,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
         verboseprint(j, order)
         orders.append(order)
 
-        if len(orders) == 400:  # to conserve memory, we remove bad orders
+        if len(orders) == 400:
             verboseprint("Trimming list of orders...")
             orders.sort()
             orders = orders[:50]
@@ -371,7 +371,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
         if not j % 20000:
             verboseprint("Removing duplicates...")
             orders.sort()
-            orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
+            orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])]
 
     verboseprint("\nFinished optimalisation")
     orders.sort()
