@@ -127,22 +127,53 @@ class Lot(object):
         self.order_amount = self.step * (minqty//self.step + (minqty % self.step > 0))
         self.price_total = round(self.order_amount * self.price, 2)
 
+    @classmethod
+    def fromHTML(cls, tag, part, vendor):
+        price1 = tag.find("font", attrs={"face": "Verdana", "size": "-2"}).text
+        if "EUR" in price1:
+            price = float(price1.strip(")").strip("(EUR "))
+        else:
+            price = float(tag.findAll("b")[1].text.strip("EUR "))
+        qty = int(tag.findAll("b")[0].text.replace(",", ""))
+        asstr = str(tag)
+        asstr_b = asstr.find("</b>")+6
+        if asstr[asstr_b] == "(":
+            step = int(asstr[asstr_b:asstr_b+asstr[asstr_b:].find(")")][2:])
+        else:
+            step = 1
+        lotnr = tag.findAll("a")[1].attrs["href"].split("=")[-1]
+        return cls(part, vendor, price, qty, step, lotnr)
+
     def __repr__(self):
         return "E"+str(self.price_total)+" for "+self.part.code+" at "+self.vendor.storename.encode("ascii", "replace")+" ("+self.vendor.loc+")"
 
 
 class Vendor(object):
-    def __init__(self, name, storename, loc, minbuy, settings):
+    def __init__(self, name, storename, loc, minbuy, preferred=[]):
         self.loc = loc
-        self.close = self.loc not in settings["preferred_countries"]
-        if settings["harsh"] and not self.close:
-            raise ValueError("Vendor not close")
+        self.close = self.loc in preferred
         self.minbuy = minbuy
         self.name = name
         self.storename = storename
         self.URL = "https://store.bricklink.com/{0}".format(self.storename)
         self.stock = []
         self.stock_parts = []
+
+    @classmethod
+    def fromHTML(cls, font, td, **kwargs):
+        name = td.findAll("a")[1].text
+        font_ = font.text.split("Min Buy: ")
+        loc = font_[0][5:][:-2]
+        if "EUR" in font_[1]:
+            try:
+                minbuy = float(font_[1][5:])
+            except ValueError:
+                minbuy = 0.0
+        else:
+            minbuy = 0.0
+        linktag = td.findAll("a")[1]
+        storename = linktag.attrs["href"].split("&")[0].split("=")[1]
+        return cls(name, storename, loc, minbuy, **kwargs)
 
     def add_lot(self, lot):
         self.stock.append(lot)
@@ -154,23 +185,22 @@ class Vendor(object):
                                                 loc=self.loc,
                                                 stock=len(self.stock))
 
-
 class Order(object):
-    def __init__(self, lots, w_close, w_far):
+    def __init__(self, lots, weight, w_far):
         self.lots = lots
         self.vendors = set(lot.vendor for lot in self.lots)
-        self._score(w_close, w_far)
+        self._score(weight, w_far)
 
-    def add_lot(self, lot, settings):
+    def add_lot(self, lot, weight, w_far):
         self.lots.append(lot)
         self.vendors.add(lot.vendor)
-        self._score(settings)
+        self._score(weight, w_far)
 
     def totalprice(self):
         return round(sum(lot.price_total for lot in self.lots), 3)
 
-    def _score(self, w_close, w_far):  # NOTE THIS DOES NOT RETURN ANYTHING
-        self.score = round(self.totalprice() + w_close * len(self.vendors) +
+    def _score(self, weight, w_far):  # NOTE THIS DOES NOT RETURN ANYTHING
+        self.score = round(self.totalprice() + weight * len(self.vendors) +
                            w_far * len([v for v in self.vendors if not v.close]), 3)
 
     def give_URLs(self):
