@@ -257,8 +257,8 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                max_vendors=15, harsh=False, weight=20, w_far=150,
                verboseprint=print, timeout=600.):
     t_end = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
-    print("Starting optimisation; will take until {0:02d}:{1:02d}"
-          .format(t_end.hour, t_end.minute))
+    verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}"
+                 .format(t_end.hour, t_end.minute))
     i = j = 0
     vendorwarning_given = False
     orders = set()
