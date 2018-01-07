@@ -154,9 +154,9 @@ class Vendor(object):
                 minbuy = 0.0
         else:
             minbuy = 0.0
-        storename = td.findAll("a")[1].attrs["href"].split("&")[0].split("=")[1]
         linktag = td.findAll("a")[1]
         storename = linktag.attrs["href"].split("&")[0].split("=")[1]
+        print(storename)
         return cls(name, storename, loc, minbuy, **kwargs)
 
     def add_lot(self, lot):
