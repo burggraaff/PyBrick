@@ -10,12 +10,17 @@ from PyBrick import functions as f
 from argparse import ArgumentParser
 
 parser = ArgumentParser()
-parser.add_argument("bsx_list", help = "Location of file with list of BSX files to import")
-parser.add_argument("-s", "--save_to", help = "Location to save order list to", default = "best.order")
-parser.add_argument("-e", "--settings_file", help = "File containing settings", default = "settings.txt")
-parser.add_argument("-t", "--timeout", help = "How many minutes to optimise for", type = float, default = 10.0)
-parser.add_argument("-m", "--max_vendors", help = "Maximum number of vendors to use", type = int, default = 10)
-parser.add_argument("-q", "--quiet", action = "store_true")
+parser.add_argument("bsx_list", help="Location of file with list of BSX files\
+                    to import")
+parser.add_argument("-s", "--save_to", help="Location to save order list to",
+                    default="best.order")
+parser.add_argument("-e", "--settings_file", help="File containing settings",
+                    default="settings.txt")
+parser.add_argument("-t", "--timeout", help="How many minutes to optimise for",
+                    type=float, default=10.0)
+parser.add_argument("-m", "--max_vendors", help="Maximum number of vendors to\
+                    use", type=int, default=10)
+parser.add_argument("-q", "--quiet", action="store_true")
 args = parser.parse_args()
 args.timeout *= 60.
 
