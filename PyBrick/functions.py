@@ -30,14 +30,18 @@ else:
 
 
 def read_settings(args):
-    regions = ["None", "Asia", "Africa", "North America", "South America", "Middle East", "Europe", "Australia & Oceania"]
+    regions = ["None", "Asia", "Africa", "North America", "South America",
+               "Middle East", "Europe", "Australia & Oceania"]
     x = open(args.settings_file, mode='r')
     lines = x.readlines()
     s = [line.split('#')[0].strip().split(":") for line in lines]
     k = {s_el[0].strip(): s_el[1].strip() for s_el in s}
-    k["preferred_countries"] = [country.strip() for country in k["preferred_countries"].split(",")]
+    k["preferred_countries"] = [country.strip() for country in
+                                k["preferred_countries"].split(",")]
     if len(k["preferred_countries"]) == 0:
-        raise ValueError("No preferred countries entered. Please enter at least one, otherwise things can go wrong.\n\nIf you think that's poor design, you're right.")
+        raise ValueError("No preferred countries entered. Please enter at \
+                         least one, otherwise things can go wrong.\n\nIf you \
+                         think that's poor design, you're right.")
     k["regionID"] = regions.index(k["region"])
     k["blacklist"] = [i.strip() for i in k["blacklist"].split(",")]
 
@@ -168,7 +172,8 @@ def divide_vendors(vendors, lots_always):
 def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
                  verboseprint=print):
     """
-    Parse the Bricklist website to look for vendors of the bricks you wish to purchase
+    Parse the Bricklist website to look for vendors of the bricks you wish to
+    purchase
 
     Parameters
     ----------
@@ -187,10 +192,12 @@ def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
         Dictionary with {vendor_name: Vendor_object}
     """
     vendors = {}
-    params_init = {"itemType": "P", "sellerLoc": "R", "regionID": settings["regionID"],
-        "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": len_vendors,
-        "searchSort": "Q", "pg": "1", "pmt": "18"}
-    verboseprint("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
+    params_init = {"itemType": "P", "sellerLoc": "R", "regionID":
+                   settings["regionID"], "shipCountryID": settings["shipto"],
+                   "viewFrom": "sf", "sz": len_vendors, "searchSort": "Q",
+                   "pg": "1", "pmt": "18"}
+    verboseprint("Will now look for vendors for {0} types of bricks"
+                 .format(len(allbricks)))
     for j, part in enumerate(allbricks):
         verboseprint(j, part.code)
         URL = part.URL(params_init)
@@ -234,7 +241,8 @@ def cheapest_lot(part, vendors):
 def vendors_of_rare_bricks(bricks, N=None):
     if N is None:
         N = len(bricks) // 25
-    return list(set(ran.choice(part.vendors) for part in bricks[:N] if part.enough()))
+    return list(set(ran.choice(part.vendors) for part in bricks[:N] if
+                    part.enough()))
 
 
 def _trim_orders(order_list, limit=50):
@@ -324,7 +332,8 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
 
     verboseprint("\nFinished optimalisation")
     orders = sorted(orders)
-    verboseprint("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1), "% )")
+    verboseprint("Found", j, "valid orders ( out of", i, "attempts -",
+                 round(float(j)/i * 100, 1), "% )")
     verboseprint("in", timeout/60., "minutes")
 
     try:

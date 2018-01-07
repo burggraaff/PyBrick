@@ -64,7 +64,8 @@ best_order = f.find_order(optimize_parts, lots_always, vendors_always,
                           timeout=args.timeout)
 
 if len(notenough):
-    print("\nNote: with current settings for finding vendors, you cannot order a full lot of:")
+    print("\nNote: with current settings for finding vendors, you cannot order\
+          a full lot of:")
     for n in notenough:
         print(n.code, ",")
     print("\nConsider ordering these in different colours.")
