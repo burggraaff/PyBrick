@@ -322,8 +322,8 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
             nrvendors_now = len(vendors_always) + len(vendors_rare) + len(vendors_notenough)
             x = max_vendors - nrvendors_now
             howmany_vendors = ran.randint(1, x)
-            howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors/7))
-            howmany_close_big = ran.randint(1, howmany_vendors/2+1)
+            howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors//7))
+            howmany_close_big = ran.randint(1, howmany_vendors//2 + 1)
             howmany_close = howmany_vendors - howmany_close_big - howmany_far
         except ValueError as e:
             if not vendorwarning_given:
