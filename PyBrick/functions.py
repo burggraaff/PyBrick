@@ -254,7 +254,7 @@ def _trim_orders(order_list, limit=50):
 
 def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                vendors_close, vendors_far, notenough,
-               max_vendors=15, harsh=False, weight=20, w_far=150,
+               max_vendors=10, harsh=False, weight=20, w_far=150,
                verboseprint=print, timeout=600.):
     t_end = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
     verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}"
