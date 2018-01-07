@@ -134,7 +134,8 @@ class Lot(object):
 class Vendor(object):
     def __init__(self, name, storename, loc, minbuy, settings):
         self.loc = loc
-        if settings["harsh"] and (self.loc not in settings["close_countries"]):
+        self.close = self.loc not in settings["preferred_countries"]
+        if settings["harsh"] and not self.close:
             raise ValueError("Vendor not close")
         self.minbuy = minbuy
         self.name = name
@@ -148,18 +149,15 @@ class Vendor(object):
         if lot.part not in self.stock_parts:
             self.stock_parts.append(lot.part)
 
-    def close(self, settings):
-        return (self.loc in settings["preferred_countries"])
-
     def __repr__(self):
         return self.storename.encode("ascii", "replace")+" in "+self.loc+" with "+str(len(self.stock))+" items"
 
 
 class Order(object):
-    def __init__(self, settings, *lots):
-        self.lots = [lot for lot in lots]
-        self.vendors = set(lot.vendor for lot in lots)
-        self._score(settings)
+    def __init__(self, lots, w_close, w_far):
+        self.lots = lots
+        self.vendors = set(lot.vendor for lot in self.lots)
+        self._score(w_close, w_far)
 
     def add_lot(self, lot, settings):
         self.lots.append(lot)
@@ -169,12 +167,13 @@ class Order(object):
     def totalprice(self):
         return round(sum(lot.price_total for lot in self.lots), 3)
 
-    def _score(self, settings): # NOTE THIS DOES NOT RETURN ANYTHING
-        self.score = round(self.totalprice() + settings["weight_close"] * len(self.vendors) +settings["weight_far"] * len([v for v in self.vendors if not v.close(settings)]), 3)
+    def _score(self, w_close, w_far):  # NOTE THIS DOES NOT RETURN ANYTHING
+        self.score = round(self.totalprice() + w_close * len(self.vendors) +
+                           w_far * len([v for v in self.vendors if not v.close]), 3)
 
     def give_URLs(self):
         URLs = sorted([lot.URL+" | "+str(lot.order_amount)+"\n" for lot in self.lots])
-        URLstring = "".join(URLs)[:-1] #[:-1] to remove trailing \n
+        URLstring = "".join(URLs)[:-1]  # [:-1] to remove trailing \n
         return URLstring
 
     def save(self, filename="a.order"):

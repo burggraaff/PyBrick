@@ -11,6 +11,8 @@ import requests
 from bs4 import BeautifulSoup as soup
 import random as ran
 import ssl
+import time
+import datetime
 
 try:
     reduce = reduce  # python 2
@@ -156,9 +158,9 @@ def check_enough(bricks):
     return parts, notenough
 
 
-def divide_vendors(vendors, lots_always, settings):
-    close = [vendor for vendor in vendors.values() if vendor.close(settings)]
-    far = [vendor for vendor in vendors.values() if not vendor.close(settings)]
+def divide_vendors(vendors, lots_always):
+    close = [vendor for vendor in vendors.values() if vendor.close]
+    far = [vendor for vendor in vendors.values() if not vendor.close]
     for l in (close, far):  # sort lists to have preferred vendors at the top
         l.sort(key=lambda vendor: -len(vendor.stock_parts))
     always = [lot.vendor for lot in lots_always]
@@ -263,7 +265,7 @@ def read_vendors(allbricks, settings, verboseprint=print):
                 except ValueError:
                     continue
     except Exception as e:
-        raise e
+        raise
 
     try:
         for vendor in vendors.values():
@@ -285,3 +287,104 @@ def vendors_of_rare_bricks(bricks, N=None):
     if N is None:
         N = len(bricks) // 25
     return list(set(ran.choice(part.vendors) for part in bricks[:N] if part.enough()))
+
+
+def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
+               vendors_close, vendors_far, notenough,
+               max_vendors=15, harsh=False, w_close=20, w_far=150,
+               verboseprint=print, timeout=600.):
+    t_end = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
+    print("Starting optimisation; will take until {0:02d}:{1:02d}"
+          .format(t_end.hour, t_end.minute))
+    i = j = 0
+    vendorwarning_given = False
+    orders = []
+    endat = time.time() + timeout
+
+    while (time.time() < endat):
+        i += 1
+        lots_notenough = []
+        vendors_notenough = []
+        if len(notenough):
+            for part in notenough:
+                lots_part = []
+                all_lots_part = part.lots[:]
+                ran.shuffle(lots_part)
+                amount = 0
+                while amount < part.qty:
+                    lots_part.append(all_lots_part.pop())
+                    amount = sum(lot.order_amount for lot in lots_part)
+                lots_part = list(lots_part)
+                if amount == part.qty:
+                    lots_notenough.extend(lots_part)
+                    continue
+                lots_part.sort(key=lambda lot: lot.order_amount)
+                while amount > part.qty:
+                    temp = lots_part.pop()
+                    amount = sum(lot.order_amount for lot in lots_part)
+                    if amount < part.qty:
+                        lots_part.append(temp)
+                        break
+                lots_notenough.extend(lots_part)
+            vendors_notenough = list(set(lot.vendor for lot in lots_notenough))
+
+        try:
+            vendors_rare = vendors_of_rare_bricks(optimize_parts)
+
+            nrvendors_now = len(vendors_always) + len(vendors_rare) + len(vendors_notenough)
+            x = max_vendors - nrvendors_now
+            howmany_vendors = ran.randint(1, x)
+            howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors/7))
+            howmany_close_big = ran.randint(1, howmany_vendors/2+1)
+            howmany_close = howmany_vendors - howmany_close_big - howmany_far
+        except ValueError as e:
+            if not vendorwarning_given:
+                print("ValueError -- consider increasing the maximum vendor parameter")
+                vendorwarning_given = True
+                print(e)
+            continue
+        try_vendors = list(set(vendors_always + vendors_notenough + vendors_rare
+                               + ran.sample(vendors_close_big, howmany_close_big)
+                               + ran.sample(vendors_close, howmany_close)
+                               + ran.sample(vendors_far, howmany_far)))
+        available_parts = list(set(reduce(lambda a, b: a + b, (vendor.stock_parts for vendor in try_vendors))))
+        if not all(part in available_parts for part in optimize_parts):
+            continue
+
+        lots = lots_always + lots_notenough + [cheapest_lot(part, try_vendors) for part in optimize_parts]
+
+        order = c.Order(lots, w_close, w_far)
+        if len(order.vendors) > max_vendors:
+            continue
+        if not order.valid_minbuy():
+            continue
+
+        j += 1
+        verboseprint(j, order)
+        orders.append(order)
+
+        if len(orders) == 400:  # to conserve memory, we remove bad orders
+            verboseprint("Trimming list of orders...")
+            orders.sort()
+            orders = orders[:50]
+
+        if not j % 20000:
+            verboseprint("Removing duplicates...")
+            orders.sort()
+            orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
+
+    verboseprint("\nFinished optimalisation")
+    orders.sort()
+    orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
+    orders = orders[:50]
+    verboseprint("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1), "% )")
+    verboseprint("in", timeout/60., "minutes")
+
+    try:
+        best = orders[0]
+        verboseprint("Best:", best)
+    except IndexError:
+        print("Did not find any orders!")
+        print("Consider changing the maxvendors and/or timeout parameters.")
+
+    return best

@@ -9,9 +9,6 @@ from __future__ import print_function
 from PyBrick import classes as c, functions as f
 from PyBrick.functions import reduce
 from argparse import ArgumentParser
-import time
-import datetime
-import random as ran
 
 parser = ArgumentParser()
 parser.add_argument("bsx_list", help = "Location of file with list of BSX files to import")
@@ -41,104 +38,17 @@ verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 optimize_parts, lots_always = f.prepare_bricks(allbricks)
 
 vendors_always, vendors_close_big, vendors_close, vendors_far = \
-    f.divide_vendors(vendors, lots_always, settings)
+    f.divide_vendors(vendors, lots_always)
 
 optimize_parts, notenough = f.check_enough(optimize_parts)
 
-t_end = datetime.datetime.now() + datetime.timedelta(seconds = args.timeout)
-verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}".format(t_end.hour, t_end.minute))
-j = 0
-i = 0
-vendorwarning_given = False
-try:
-    assert orders
-except:
-    orders = []
-endat = time.time() + args.timeout
-while (time.time() < endat):
-    i += 1
-    lots_notenough = []
-    vendors_notenough = []
-    if len(notenough):
-        for part in notenough:
-            lots_part = []
-            all_lots_part = part.lots[:]
-            ran.shuffle(lots_part)
-            amount = 0
-            while amount < part.qty:
-                lots_part.append(all_lots_part.pop())
-                amount = sum(lot.order_amount for lot in lots_part)
-            lots_part = list(lots_part)
-            if amount == part.qty:
-                lots_notenough.extend(lots_part)
-                continue
-            lots_part.sort(key = lambda lot: lot.order_amount)
-            while amount > part.qty:
-                temp = lots_part.pop()
-                amount = sum(lot.order_amount for lot in lots_part)
-                if amount < part.qty:
-                    lots_part.append(temp)
-                    break
-            lots_notenough.extend(lots_part)
-        vendors_notenough = list(set(lot.vendor for lot in lots_notenough))
-
-    try:
-        vendors_rare = f.vendors_of_rare_bricks(optimize_parts)
-
-        nrvendors_now = len(vendors_always) + len(vendors_rare) + len(vendors_notenough)
-        x = args.max_vendors-nrvendors_now
-        howmany_vendors = ran.randint(1, x)
-        howmany_far = 0 if settings["harsh"] else ran.randint(0, int(howmany_vendors/7))
-        howmany_close_big = ran.randint(1, howmany_vendors/2+1)
-        howmany_close = howmany_vendors - howmany_close_big - howmany_far
-    except ValueError as e:
-        if not vendorwarning_given:
-            print("ValueError -- consider increasing the maximum vendor parameter")
-            vendorwarning_given = True
-            print(e)
-        continue
-    try_vendors = list(set(vendors_always + vendors_notenough + vendors_rare \
-    + ran.sample(vendors_close_big, howmany_close_big) + ran.sample(vendors_close, howmany_close) \
-    + ran.sample(vendors_far, howmany_far)))
-    available_parts = list(set(reduce(lambda a, b: a + b, (vendor.stock_parts for vendor in try_vendors))))
-    if not all(part in available_parts for part in allbricks):
-        continue
-
-    lots = lots_always + lots_notenough + [f.cheapest_lot(part, try_vendors) for part in optimize_parts]
-
-    order = c.Order(settings, *lots)
-    if len(order.vendors) > args.max_vendors:
-        continue
-    if not order.valid_minbuy():
-        continue
-
-    j += 1
-    verboseprint(j, order) #printing the orders does not significantly slow the loop down
-    orders.append(order)
-
-    if len(orders) == 400: # to conserve memory, we remove bad orders
-        verboseprint("Trimming list of orders...")
-        orders.sort()
-        orders = orders[:50]
-
-    if not j%20000:
-        verboseprint("Removing duplicates...")
-        orders.sort()
-        orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
-
-verboseprint("\nFinished optimalisation")
-orders.sort()
-orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
-orders = orders[:50]
-verboseprint("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1) , "% )")
-verboseprint("in", args.timeout/60., "minutes")
-
-try:
-    best = orders[0]
-    verboseprint("Best:", best)
-except IndexError:
-    print("Did not find any orders!")
-    print("Consider changing the maxvendors and/or timeout parameters.")
+best_order = f.find_order(optimize_parts, lots_always, vendors_always,
+                          vendors_close_big, vendors_close, vendors_far,
+                          notenough, max_vendors=args.max_vendors,
+                          harsh=settings["harsh"],
+                          w_close=settings["weight_close"],
+                          w_far=settings["weight_far"],
+                          verboseprint=verboseprint, timeout=args.timeout)
 
 if len(notenough):
     print("\nNote: with current settings for finding vendors, you cannot order a full lot of:")
@@ -150,6 +60,5 @@ verboseprint("The following parts have the fewest available lots:")
 for part in optimize_parts[:10]:
     verboseprint(part.code, "({0})".format(len(part.lots)), end=" ")
 
-if len(orders) > 0:
-    verboseprint("\nSaving best order to file:", args.save_to)
-    orders[0].save(args.save_to)
+verboseprint("\nSaving best order to file:", args.save_to)
+best_order.save(args.save_to)
