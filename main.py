@@ -21,7 +21,7 @@ parser.add_argument("-t", "--timeout", help="How many minutes to optimise for",
 parser.add_argument("-m", "--max_vendors", help="Maximum number of vendors to\
                     use", type=int, default=10)
 parser.add_argument("-l", "--len_vendors", help="Number of vendors per brick\
-                    to fetch from Bricklink per brick", type=int, default=250)
+                    to fetch from Bricklink per brick", type=int, default=100)
 parser.add_argument("-H", "--harsh", action="store_true", help="If True, only\
                     use vendors from preferred countries")
 parser.add_argument("-q", "--quiet", action="store_true")

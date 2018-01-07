@@ -167,7 +167,7 @@ def divide_vendors(vendors, lots_always):
     return always, close_big, close, far
 
 
-def read_vendors(allbricks, settings, len_vendors=250, harsh=False,
+def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
                  verboseprint=print):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
