@@ -29,6 +29,10 @@ else:
     ssl._create_default_https_context = _create_unverified_https_context
 
 
+def do_nothing(*args, **kwargs):
+    return
+
+
 def read_settings(args):
     regions = ["None", "Asia", "Africa", "North America", "South America",
                "Middle East", "Europe", "Australia & Oceania"]
@@ -252,13 +256,34 @@ def _trim_orders(order_list, limit=50):
     return orders
 
 
+def find_max_vendors(optimize_parts, lots_always, vendors_always,
+                     vendors_close_big, vendors_close, vendors_far, notenough,
+                     rangemax=50, time_each=1., **kwargs):
+    kwargs.pop("verboseprint")  # prevent printing
+    kwargs.pop("max_vendors")  # prevent printing
+    kwargs.pop("timeout")  # prevent printing
+    results = [0 for i in range(rangemax+1)]
+    for i in range(rangemax):
+        try:
+            best, orders = find_order(optimize_parts, lots_always,
+                                      vendors_always, vendors_close_big,
+                                      vendors_close, vendors_far, notenough,
+                                      max_vendors=i, timeout=time_each,
+                                      verboseprint=do_nothing, **kwargs)
+            results[i] = len(orders)
+        except Exception as e:
+            print(e)
+            continue
+    return results
+
+
 def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                vendors_close, vendors_far, notenough,
                max_vendors=15, harsh=False, weight=20, w_far=150,
                verboseprint=print, timeout=600.):
     t_end = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
-    print("Starting optimisation; will take until {0:02d}:{1:02d}"
-          .format(t_end.hour, t_end.minute))
+    verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}"
+                 .format(t_end.hour, t_end.minute))
     i = j = 0
     vendorwarning_given = False
     orders = set()
@@ -343,4 +368,4 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
         print("Did not find any orders!")
         print("Consider changing the maxvendors and/or timeout parameters.")
 
-    return best
+    return best, orders

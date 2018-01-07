@@ -33,7 +33,7 @@ args = parser.parse_args()
 args.timeout *= 60.
 
 # print if not quiet, else do nothing
-verboseprint = print if not args.quiet else lambda *args, **kwargs: None
+verboseprint = print if not args.quiet else f.do_nothing
 
 settings = f.read_settings(args)
 verboseprint("Read settings from {0}".format(args.settings_file))
@@ -56,12 +56,13 @@ vendors_always, vendors_close_big, vendors_close, vendors_far = \
 
 optimize_parts, notenough = f.check_enough(optimize_parts)
 
-best_order = f.find_order(optimize_parts, lots_always, vendors_always,
-                          vendors_close_big, vendors_close, vendors_far,
-                          notenough, max_vendors=args.max_vendors,
-                          harsh=args.harsh, weight=args.weight,
-                          w_far=args.w_far, verboseprint=verboseprint,
-                          timeout=args.timeout)
+best_order, orders = f.find_order(optimize_parts, lots_always, vendors_always,
+                                  vendors_close_big, vendors_close,
+                                  vendors_far, notenough,
+                                  max_vendors=args.max_vendors,
+                                  harsh=args.harsh, weight=args.weight,
+                                  w_far=args.w_far, verboseprint=verboseprint,
+                                  timeout=args.timeout)
 
 if len(notenough):
     print("\nNote: with current settings for finding vendors, you cannot order\
