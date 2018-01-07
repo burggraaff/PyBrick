@@ -36,8 +36,6 @@ def read_settings(args):
     s = [line.split('#')[0].strip().split(":") for line in lines]
     k = {s_el[0].strip(): s_el[1].strip() for s_el in s}
     k["preferred_countries"] = [country.strip() for country in k["preferred_countries"].split(",")]
-    k["weight_close"] = float(k["weight_close"])
-    k["weight_far"] = float(k["weight_far"])
     if len(k["preferred_countries"]) == 0:
         raise ValueError("No preferred countries entered. Please enter at least one, otherwise things can go wrong.\n\nIf you think that's poor design, you're right.")
     k["regionID"] = regions.index(k["region"])
@@ -248,7 +246,7 @@ def _trim_orders(order_list, limit=50):
 
 def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                vendors_close, vendors_far, notenough,
-               max_vendors=15, harsh=False, w_close=20, w_far=150,
+               max_vendors=15, harsh=False, weight=20, w_far=150,
                verboseprint=print, timeout=600.):
     t_end = datetime.datetime.now() + datetime.timedelta(seconds=timeout)
     print("Starting optimisation; will take until {0:02d}:{1:02d}"
@@ -310,7 +308,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
 
         lots = lots_always + lots_notenough + [cheapest_lot(part, try_vendors) for part in optimize_parts]
 
-        order = Order(lots, w_close, w_far)
+        order = Order(lots, weight, w_far)
         if len(order.vendors) > max_vendors:
             continue
         if not order.valid_minbuy():

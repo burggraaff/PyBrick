@@ -43,6 +43,8 @@ Additionally, there are several optional arguments to tweak the performance of t
 | `-t` | `timeout` | Number of minutes to run the optimisation for | `10.0` |
 | `-m` | `max_vendors` | Maximum number of different vendors to buy from | `10` |
 | `-l` | `len_vendors` | Number of vendors from BrickLink to parse for each brick. Higher values allow for more options to test in the optimisation, but consequently slow the process down. | `100` |
+| `-w` | `weight` | Weight to be given to each individual vendor. High values favour using fewer vendors, low values favour using more vendors. | `20` |
+| `-f` | `w_far` | Additional weight given to countries that are *not* preferred. High values favour vendors in preferred countries. | `150` |
 | `-H` | `harsh` | **Only** use vendors within your preferred countries | False |
 | `-q` | `quiet` | Suppress text output in command line | False |
 
@@ -69,8 +71,6 @@ As mentioned earlier, the `-e` keyword can be used to specify advanced settings 
 | `shipto` | Code of the country you want your bricks shipped to; these can be determined using the BrickLink search function | `NL` (Netherlands) |
 | `region` | Region from which you would like to purchase. Possibilities are `None`, `Asia`, `Africa`, `North America`, `South America`, `Middle East`, `Europe`, `Australia & Oceania`. `None` allows vendors from all regions of the world to be used. | `Europe` |
 | `preferred_countries` | Countries within the given region that you prefer to source bricks from, e.g. for quick or cheap shipment. | `Netherlands, Germany` |
-| `weight_close` | Weight to be given to each individual vendor. High values favour using fewer vendors, low values favour using more vendors. | `20` |
-| `weight_far` | Additional weight given to countries that are *not* preferred. High values favour vendors in preferred countries. | `150` |
 | `blacklist` | Names of vendors that one **never** wants to order from, e.g. due to doubtful reputation or temporary shop closures. |  (none) |
 
 ## Output

@@ -22,6 +22,10 @@ parser.add_argument("-m", "--max_vendors", help="Maximum number of vendors to\
                     use", type=int, default=10)
 parser.add_argument("-l", "--len_vendors", help="Number of vendors per brick\
                     to fetch from Bricklink per brick", type=int, default=100)
+parser.add_argument("-w", "--weight", help="Weight to add for nearby vendors",
+                    type=int, default=20)
+parser.add_argument("-f", "--w_far", help="Weight to add for faraway vendors",
+                    type=int, default=150)
 parser.add_argument("-H", "--harsh", action="store_true", help="If True, only\
                     use vendors from preferred countries")
 parser.add_argument("-q", "--quiet", action="store_true")
@@ -41,7 +45,8 @@ allbricks = f.read_bricks(bsx_files, verboseprint=verboseprint)
 verboseprint("Made list of {0} types of bricks".format(len(allbricks)))
 
 vendors = f.read_vendors(allbricks, settings, harsh=args.harsh,
-                         verboseprint=verboseprint, len_vendors=args.len_vendors)
+                         verboseprint=verboseprint,
+                         len_vendors=args.len_vendors)
 verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 
 optimize_parts, lots_always = f.prepare_bricks(allbricks)
@@ -54,9 +59,9 @@ optimize_parts, notenough = f.check_enough(optimize_parts)
 best_order = f.find_order(optimize_parts, lots_always, vendors_always,
                           vendors_close_big, vendors_close, vendors_far,
                           notenough, max_vendors=args.max_vendors,
-                          harsh=args.harsh, w_close=settings["weight_close"],
-                          w_far=settings["weight_far"],
-                          verboseprint=verboseprint, timeout=args.timeout)
+                          harsh=args.harsh, weight=args.weight,
+                          w_far=args.w_far, verboseprint=verboseprint,
+                          timeout=args.timeout)
 
 if len(notenough):
     print("\nNote: with current settings for finding vendors, you cannot order a full lot of:")
