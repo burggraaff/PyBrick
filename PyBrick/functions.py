@@ -108,7 +108,7 @@ def read_bricks(files, nr=-1, verboseprint=print):
 
     allbricks_.sort(key=lambda part: -part.qty)
 
-    verboseprint()
+    verboseprint("")
 
     if nr != -1:
         return allbricks_[:nr]
