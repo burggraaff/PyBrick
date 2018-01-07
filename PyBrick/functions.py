@@ -210,43 +210,34 @@ def read_vendors(allbricks, settings, verboseprint=print):
         "shipCountryID": settings["shipto"], "viewFrom": "sf", "sz": settings["vendorlist_length"],
         "searchSort": "Q", "pg": "1", "pmt": "18"}
     verboseprint("Will now look for vendors for {0} types of bricks".format(len(allbricks)))
-    try:
-        for j, part in enumerate(allbricks):
-            verboseprint(j, part.code)
-            URL = part.URL(params_init)
+    for j, part in enumerate(allbricks):
+        verboseprint(j, part.code)
+        URL = part.URL(params_init)
+        html = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'}).text
+        htmlsoup = soup(html, "html.parser")
+        if "No Item(s) were found.  Please try again!" in htmlsoup.text:
+            params_init_ = params_init.copy()
+            params_init_["qMin"] = 1
+            URL = part.URL(params_init_)
             html = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'}).text
             htmlsoup = soup(html, "html.parser")
-            if "No Item(s) were found.  Please try again!" in htmlsoup.text:
-                params_init_ = params_init.copy()
-                params_init_["qMin"] = 1
-                URL = part.URL(params_init_)
-                html = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'}).text
-                htmlsoup = soup(html, "html.parser")
-            qtylinkprice = htmlsoup.findAll("td", {"valign": "TOP"})
-            locminbuy = htmlsoup.findAll("font", {"color": r"#606060"})
-            for l, q in zip(locminbuy, qtylinkprice):
-                try:
-                    new_vendor = Vendor.fromHTML(l, q, settings)
-                    new_name = new_vendor.storename
-                    if new_name not in vendors:
-                        vendors[new_name] = new_vendor
-                    lot = parse_lot(part, q, vendors[new_name])
-                    vendors[new_name].add_lot(lot)
-                    part.add_vendor(vendors[new_name])
-                    part.add_lot(lot)
-                except ValueError:
-                    continue
-    except Exception as e:
-        raise
+        qtylinkprice = htmlsoup.findAll("td", {"valign": "TOP"})
+        locminbuy = htmlsoup.findAll("font", {"color": r"#606060"})
+        for l, q in zip(locminbuy, qtylinkprice):
+            new_vendor = Vendor.fromHTML(l, q, settings)
+            new_name = new_vendor.storename
+            if new_name not in vendors:
+                vendors[new_name] = new_vendor
+            lot = parse_lot(part, q, vendors[new_name])
+            vendors[new_name].add_lot(lot)
+            part.add_vendor(vendors[new_name])
+            part.add_lot(lot)
 
-    try:
-        for vendor in vendors.values():
-            if sum(lot.price_total for lot in vendor.stock) < vendor.minbuy:
-                del vendor  # remove vendors you can never buy from
-            elif vendor.storename in settings["blacklist"]:
-                del vendor
-    except Exception as e:
-        raise
+    for vendor in vendors.values():
+        if sum(lot.price_total for lot in vendor.stock) < vendor.minbuy:
+            del vendor  # remove vendors you can never buy from
+        elif vendor.storename in settings["blacklist"]:
+            del vendor
 
     return vendors
 
