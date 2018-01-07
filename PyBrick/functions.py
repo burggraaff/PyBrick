@@ -168,33 +168,6 @@ def divide_vendors(vendors, lots_always):
     return always, close_big, close, far
 
 
-def find_vendor_name(tdtag):
-    return tdtag.findAll("a")[1].text
-
-
-def find_vendor_storename(tdtag):
-    return tdtag.findAll("a")[1].attrs["href"].split("&")[0].split("=")[1]
-
-
-def parse_vendor(fonttag, tdtag, settings):
-    name = find_vendor_name(tdtag)
-    font_ = fonttag.text.split("Min Buy: ")
-    loc = font_[0][5:][:-2]
-    if settings["harsh"] and (loc not in settings["close_countries"]):
-        raise ValueError("Vendor not close")
-    if "EUR" in font_[1]:
-        try:
-            minbuy = float(font_[1][5:])
-        except ValueError:
-            minbuy = 0.0
-    else:
-        minbuy = 0.0
-    storename = find_vendor_storename(tdtag)
-    linktag = tdtag.findAll("a")[1]
-    storename = linktag.attrs["href"].split("&")[0].split("=")[1]
-    return Vendor(name, storename, loc, minbuy, settings)
-
-
 def parse_lot(part, tdtag, vendor):
     price1 = tdtag.find("font", attrs={"face": "Verdana", "size": "-2"}).text
     if "EUR" in price1:
@@ -253,14 +226,13 @@ def read_vendors(allbricks, settings, verboseprint=print):
             locminbuy = htmlsoup.findAll("font", {"color": r"#606060"})
             for l, q in zip(locminbuy, qtylinkprice):
                 try:
-                    storename = find_vendor_storename(q)
-                    if storename in settings["blacklist"]:
-                        continue
-                    if storename not in vendors:
-                        vendors[storename] = parse_vendor(l, q, settings)
-                    lot = parse_lot(part, q, vendors[storename])
-                    vendors[storename].add_lot(lot)
-                    part.add_vendor(vendors[storename])
+                    new_vendor = Vendor.fromHTML(l, q, settings)
+                    new_name = new_vendor.storename
+                    if new_name not in vendors:
+                        vendors[new_name] = new_vendor
+                    lot = parse_lot(part, q, vendors[new_name])
+                    vendors[new_name].add_lot(lot)
+                    part.add_vendor(vendors[new_name])
                     part.add_lot(lot)
                 except ValueError:
                     continue
@@ -271,8 +243,10 @@ def read_vendors(allbricks, settings, verboseprint=print):
         for vendor in vendors.values():
             if sum(lot.price_total for lot in vendor.stock) < vendor.minbuy:
                 del vendor  # remove vendors you can never buy from
+            elif vendor.storename in settings["blacklist"]:
+                del vendor
     except Exception as e:
-        raise e
+        raise
 
     return vendors
 

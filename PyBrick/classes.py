@@ -144,6 +144,25 @@ class Vendor(object):
         self.stock = []
         self.stock_parts = []
 
+    @classmethod
+    def fromHTML(cls, font, td, settings):
+        name = td.findAll("a")[1].text
+        font_ = font.text.split("Min Buy: ")
+        loc = font_[0][5:][:-2]
+        if settings["harsh"] and (loc not in settings["close_countries"]):
+            raise ValueError("Vendor not close")
+        if "EUR" in font_[1]:
+            try:
+                minbuy = float(font_[1][5:])
+            except ValueError:
+                minbuy = 0.0
+        else:
+            minbuy = 0.0
+        storename = td.findAll("a")[1].attrs["href"].split("&")[0].split("=")[1]
+        linktag = td.findAll("a")[1]
+        storename = linktag.attrs["href"].split("&")[0].split("=")[1]
+        return cls(name, storename, loc, minbuy, settings)
+
     def add_lot(self, lot):
         self.stock.append(lot)
         if lot.part not in self.stock_parts:
@@ -151,7 +170,6 @@ class Vendor(object):
 
     def __repr__(self):
         return self.storename.encode("ascii", "replace")+" in "+self.loc+" with "+str(len(self.stock))+" items"
-
 
 class Order(object):
     def __init__(self, lots, w_close, w_far):
