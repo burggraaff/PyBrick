@@ -70,6 +70,14 @@ class Brick(object):
         """
         self.lots.sort(key=lambda lot: lot.price_total)
 
+    def cheapest_lot(self, vendors):
+        """
+        Find the cheapest lot of this item from the given vendors
+        """
+        available_lots = [lot for lot in self.lots if lot.vendor in vendors]
+        available_lots.sort(key=lambda lot: lot.price_total)
+        return available_lots[0]
+
     def enough(self):
         """
         Does any single lot have enough of this brick?

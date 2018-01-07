@@ -232,12 +232,6 @@ def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
     return vendors
 
 
-def cheapest_lot(part, vendors):
-    available_lots = [lot for lot in part.lots if lot.vendor in vendors]
-    available_lots.sort(key=lambda lot: lot.price_total)
-    return available_lots[0]
-
-
 def vendors_of_rare_bricks(bricks, N=None):
     if N is None:
         N = len(bricks) // 25
@@ -314,7 +308,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
         if not all(part in available_parts for part in optimize_parts):
             continue
 
-        lots = lots_always + lots_notenough + [cheapest_lot(part, try_vendors) for part in optimize_parts]
+        lots = lots_always + lots_notenough + [part.cheapest_lot(try_vendors) for part in optimize_parts]
 
         order = Order(lots, weight, w_far)
         if len(order.vendors) > max_vendors:
