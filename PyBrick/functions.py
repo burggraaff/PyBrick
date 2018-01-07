@@ -168,23 +168,6 @@ def divide_vendors(vendors, lots_always):
     return always, close_big, close, far
 
 
-def parse_lot(part, tdtag, vendor):
-    price1 = tdtag.find("font", attrs={"face": "Verdana", "size": "-2"}).text
-    if "EUR" in price1:
-        price = float(price1.strip(")").strip("(EUR "))
-    else:
-        price = float(tdtag.findAll("b")[1].text.strip("EUR "))
-    qty = int(tdtag.findAll("b")[0].text.replace(",", ""))
-    asstr = str(tdtag)
-    asstr_close_b = asstr.find("</b>")+6
-    if asstr[asstr_close_b] == "(":
-        step = int(asstr[asstr_close_b:asstr_close_b+asstr[asstr_close_b:].find(")")][2:])
-    else:
-        step = 1
-    lotnr = tdtag.findAll("a")[1].attrs["href"].split("=")[-1]
-    return Lot(part, vendor, price, qty, step, lotnr)
-
-
 def read_vendors(allbricks, settings, verboseprint=print):
     """
     Parse the Bricklist website to look for vendors of the bricks you wish to purchase
@@ -230,7 +213,7 @@ def read_vendors(allbricks, settings, verboseprint=print):
             new_name = new_vendor.storename
             if new_name not in vendors:
                 vendors[new_name] = new_vendor
-            lot = parse_lot(part, q, vendors[new_name])
+            lot = Lot.fromHTML(q, part, vendors[new_name])
             vendors[new_name].add_lot(lot)
             part.add_vendor(vendors[new_name])
             part.add_lot(lot)

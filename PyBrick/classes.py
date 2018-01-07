@@ -127,6 +127,23 @@ class Lot(object):
         self.order_amount = self.step * (minqty//self.step + (minqty % self.step > 0))
         self.price_total = round(self.order_amount * self.price, 2)
 
+    @classmethod
+    def fromHTML(cls, tag, part, vendor):
+        price1 = tag.find("font", attrs={"face": "Verdana", "size": "-2"}).text
+        if "EUR" in price1:
+            price = float(price1.strip(")").strip("(EUR "))
+        else:
+            price = float(tag.findAll("b")[1].text.strip("EUR "))
+        qty = int(tag.findAll("b")[0].text.replace(",", ""))
+        asstr = str(tag)
+        asstr_b = asstr.find("</b>")+6
+        if asstr[asstr_b] == "(":
+            step = int(asstr[asstr_b:asstr_b+asstr[asstr_b:].find(")")][2:])
+        else:
+            step = 1
+        lotnr = tag.findAll("a")[1].attrs["href"].split("=")[-1]
+        return cls(part, vendor, price, qty, step, lotnr)
+
     def __repr__(self):
         return "E"+str(self.price_total)+" for "+self.part.code+" at "+self.vendor.storename.encode("ascii", "replace")+" ("+self.vendor.loc+")"
 
@@ -156,7 +173,6 @@ class Vendor(object):
             minbuy = 0.0
         linktag = td.findAll("a")[1]
         storename = linktag.attrs["href"].split("&")[0].split("=")[1]
-        print(storename)
         return cls(name, storename, loc, minbuy, **kwargs)
 
     def add_lot(self, lot):
