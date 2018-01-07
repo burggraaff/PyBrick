@@ -117,7 +117,10 @@ def read_bricks(files, nr=-1, verboseprint=print):
 
 
 def prepare_bricks(allbricks):
-    optimize_parts = list(allbricks)
+    """
+    Sorts bricks by amount of lots, and sorts lots within each brick by price
+    """
+    optimize_parts = list(allbricks)  # copy
     optimize_parts.sort(key=lambda part: len(part.lots))
     for part in optimize_parts:
         part.sort_lots()
