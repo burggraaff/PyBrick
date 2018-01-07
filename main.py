@@ -38,14 +38,7 @@ verboseprint("Made list of {0} types of bricks".format(len(allbricks)))
 vendors = f.read_vendors(allbricks, settings, verboseprint=verboseprint)
 verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
 
-optimize_parts = f.prepare_bricks(allbricks)
-
-# if there is a brick with only one lot, always use that vendor and lot
-lots_always = []
-for part in allbricks:
-    if part.nrvendors() == 1:
-        lots_always.append(part.lots[0])
-        optimize_parts.remove(part)
+optimize_parts, lots_always = f.prepare_bricks(allbricks)
 
 vendors_close = [vendor for vendor in vendors.values() if vendor.close(settings)]
 vendors_far = [vendor for vendor in vendors.values() if not vendor.close(settings)]

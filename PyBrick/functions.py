@@ -119,12 +119,23 @@ def read_bricks(files, nr=-1, verboseprint=print):
 def prepare_bricks(allbricks):
     """
     Sorts bricks by amount of lots, and sorts lots within each brick by price
+
+    Splits bricks that should always be ordered from a particular lot off, so
+    these are not optimised.
     """
     optimize_parts = list(allbricks)  # copy
     optimize_parts.sort(key=lambda part: len(part.lots))
     for part in optimize_parts:
         part.sort_lots()
-        return optimize_parts
+
+    # if there is a brick with only one lot, always use that vendor and lot
+    lots_always = []
+    for part in optimize_parts:
+        if part.nrvendors() == 1:
+            lots_always.append(part.lots[0])
+            optimize_parts.remove(part)
+
+    return optimize_parts, lots_always
 
 
 def find_vendor_name(tdtag):
