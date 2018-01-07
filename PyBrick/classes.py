@@ -196,5 +196,8 @@ class Order(object):
     def __lt__(self, other):
         return self.score < other.score
 
+    def __hash__(self):
+        return hash(self.score)
+
     def __repr__(self):
         return "Order of score "+str(self.score)+" with price "+str(self.totalprice())+" at "+str(len(self.vendors))+" vendors"

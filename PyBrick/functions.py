@@ -289,6 +289,13 @@ def vendors_of_rare_bricks(bricks, N=None):
     return list(set(ran.choice(part.vendors) for part in bricks[:N] if part.enough()))
 
 
+def _trim_orders(order_list, limit=50):
+    orders = sorted(order_list)
+    orders = orders[:limit]
+    orders = set(orders)
+    return orders
+
+
 def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                vendors_close, vendors_far, notenough,
                max_vendors=15, harsh=False, w_close=20, w_far=150,
@@ -298,7 +305,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
           .format(t_end.hour, t_end.minute))
     i = j = 0
     vendorwarning_given = False
-    orders = []
+    orders = set()
     endat = time.time() + timeout
 
     while (time.time() < endat):
@@ -361,22 +368,14 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
 
         j += 1
         verboseprint(j, order)
-        orders.append(order)
+        orders.add(order)
 
         if len(orders) == 400:
             verboseprint("Trimming list of orders...")
-            orders.sort()
-            orders = orders[:50]
-
-        if not j % 20000:
-            verboseprint("Removing duplicates...")
-            orders.sort()
-            orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])]
+            orders = _trim_orders(orders)
 
     verboseprint("\nFinished optimalisation")
-    orders.sort()
-    orders = [order_ for z, order_ in enumerate(orders) if not any(order_ == order2 for order2 in orders[:z])] # remove duplicates
-    orders = orders[:50]
+    orders = sorted(orders)
     verboseprint("Found", j, "valid orders ( out of", i, "attempts -", round(float(j)/i * 100, 1), "% )")
     verboseprint("in", timeout/60., "minutes")
 
