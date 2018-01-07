@@ -43,8 +43,8 @@ Additionally, there are several optional arguments to tweak the performance of t
 | `-t` | `timeout` | Number of minutes to run the optimisation for | 10.0 |
 | `-m` | `max_vendors` | Maximum number of different vendors to buy from | 10 |
 | `-l` | `len_vendors` | Number of vendors from BrickLink to parse for each brick. Higher values allow for more options to test in the optimisation, but consequently slow the process down. | `100` |
-| `-q` | `quiet` | Suppress text output in command line | False |
 | `-H` | `harsh` | **Only** use vendors within your preferred countries | False |
+| `-q` | `quiet` | Suppress text output in command line | False |
 
 These keywords are used in the same way as those for any other command line programmes. Some examples:
 
