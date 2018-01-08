@@ -163,7 +163,7 @@ def divide_vendors(vendors, lots_always):
     far = [vendor for vendor in vendors.values() if not vendor.close]
     for l in (close, far):  # sort lists to have preferred vendors at the top
         l.sort(key=lambda vendor: -len(vendor.stock_parts))
-    always = [lot.vendor for lot in lots_always]
+    always = {lot.vendor for lot in lots_always}
     close_big = close[:20]
     return always, close_big, close, far
 
@@ -234,8 +234,7 @@ def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
 def _vendors_of_rare_bricks(bricks, N=None):
     if N is None:
         N = len(bricks) // 25
-    return list(set(ran.choice(part.vendors) for part in bricks[:N] if
-                    part.enough()))
+    return {ran.choice(part.vendors) for part in bricks[:N] if part.enough()}
 
 
 def _trim_orders(order_list, limit=50):
@@ -266,7 +265,7 @@ def _not_enough(notenough):
                     lots_part.append(temp)
                     break
         lots.extend(lots_part)
-    vendors = list(set(lot.vendor for lot in lots))
+    vendors = {lot.vendor for lot in lots}
     return lots, vendors
 
 
@@ -277,17 +276,23 @@ def _generate_vendors(optimize_parts, notenough, vendors_always,
 
     vendors_rare = _vendors_of_rare_bricks(optimize_parts)
 
-    nrvendors_now = len(vendors_always) + len(vendors_rare) + len(vendors_notenough)
-    x = max_vendors - nrvendors_now
-    howmany_vendors = ran.randint(1, x)
-    howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors//7))
-    howmany_close_big = ran.randint(1, howmany_vendors//2 + 1)
-    howmany_close = howmany_vendors - howmany_close_big - howmany_far
-    vendors = list(set(vendors_always + vendors_notenough + vendors_rare
-                       + ran.sample(vendors_close_big, howmany_close_big)
-                       + ran.sample(vendors_close, howmany_close)
-                       + ran.sample(vendors_far, howmany_far)))
+    vendors_pre = set.union(vendors_always, vendors_notenough, vendors_rare)
+    nrvendors_pre = len(vendors_pre)
 
+    x = max_vendors - nrvendors_pre
+    howmany_vendors = ran.randint(1, x)
+
+    howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors//7))
+    which_far = set(ran.sample(vendors_far, howmany_far))
+
+    howmany_close_big = ran.randint(1, howmany_vendors//2 + 1)
+    which_close_big = set(ran.sample(vendors_close_big, howmany_close_big))
+
+    howmany_close = howmany_vendors - howmany_close_big - howmany_far
+    which_close = set(ran.sample(vendors_far, howmany_far))
+
+    vendors = set.union(vendors_pre, which_far, which_close_big, which_close)
+    print(howmany_vendors, len(vendors), howmany_far, howmany_close_big, howmany_close)
     return lots_notenough, vendors
 
 
@@ -331,7 +336,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
             continue
 
         j += 1
-        verboseprint(j, order)
+        #verboseprint(j, order)
         orders.add(order)
 
         if len(orders) == 400:
