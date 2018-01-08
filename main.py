@@ -65,9 +65,9 @@ best_order, orders = f.find_order(optimize_parts, lots_always, vendors_always,
 
 if len(notenough):
     print("\nNote: with current settings for finding vendors, you cannot order\
-          a full lot of:")
+ a full lot of:")
     for n in notenough:
-        print(n.code, ",")
+        print(n.code, end=", ")
     print("\nConsider ordering these in different colours.")
 
 verboseprint("The following parts have the fewest available lots:")

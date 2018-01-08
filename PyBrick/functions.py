@@ -295,7 +295,6 @@ def _generate_vendors(optimize_parts, notenough, vendors_always,
     which_close = set(ran.sample(vendors_close, howmany_close))
 
     vendors = set.union(vendors_pre, which_far, which_close_big, which_close)
-    print(choices_left, howmany_vendors, len(vendors), howmany_far, howmany_close_big, howmany_close)
 
     return lots_notenough, vendors
 
@@ -322,7 +321,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                                                             vendors_far,
                                                             max_vendors,
                                                             harsh=harsh)
-        except ValueError:
+        except ValueError as e:
             if not vendorwarning_given:
                 vendorwarning_given = True
                 print("ValueError -- consider changing MaxVendors")
@@ -341,7 +340,7 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
             continue
 
         j += 1
-        #verboseprint(j, order)
+        verboseprint(j, order)
         orders.add(order)
 
         if len(orders) == 400:
