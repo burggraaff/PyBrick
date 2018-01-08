@@ -314,7 +314,8 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
         if not all(part in available_parts for part in optimize_parts):
             continue
 
-        lots = lots_always + lots_notenough + [cheapest_lot(part, try_vendors) for part in optimize_parts]
+        lots = lots_always + lots_notenough + \
+            [part.cheapest_lot(try_vendors) for part in optimize_parts]
 
         order = Order(lots, weight, w_far)
         if len(order.vendors) > max_vendors:
@@ -343,4 +344,4 @@ def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
         print("Did not find any orders!")
         print("Consider changing the maxvendors and/or timeout parameters.")
 
-    return best
+    return best, orders

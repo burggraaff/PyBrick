@@ -180,6 +180,12 @@ class Vendor(object):
         if lot.part not in self.stock_parts:
             self.stock_parts.append(lot.part)
 
+    def __eq__(self, other):
+        return self.storename == other.storename
+
+    def __hash__(self):
+        return hash(self.storename)
+
     def __repr__(self):
         return self.storename.encode("ascii", "replace")+" in "+self.loc+" with "+str(len(self.stock))+" items"
 
