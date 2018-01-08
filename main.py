@@ -47,6 +47,7 @@ vendors = f.read_vendors(allbricks, settings, harsh=args.harsh,
                          verboseprint=verboseprint,
                          len_vendors=args.len_vendors)
 verboseprint("Made list of vendors, {nr} in total".format(nr=len(vendors)))
+print(vendors)
 
 optimize_parts, lots_always = f.prepare_bricks(allbricks)
 

@@ -195,7 +195,9 @@ class Vendor(object):
         return hash(self.storename)
 
     def __repr__(self):
-        return self.storename.encode("ascii", "replace")+" in "+self.loc+" with "+str(len(self.stock))+" items"
+        return "{name} ({loc}, {stock})".format(name=self.storename,
+                                                loc=self.loc,
+                                                stock=len(self.stock))
 
 class Order(object):
     def __init__(self, lots, weight, w_far):
