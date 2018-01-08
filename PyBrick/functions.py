@@ -11,7 +11,6 @@ import requests
 from bs4 import BeautifulSoup as soup
 import random as ran
 import ssl
-import time
 import datetime
 
 try:
@@ -232,7 +231,7 @@ def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
     return vendors
 
 
-def vendors_of_rare_bricks(bricks, N=None):
+def _vendors_of_rare_bricks(bricks, N=None):
     if N is None:
         N = len(bricks) // 25
     return list(set(ran.choice(part.vendors) for part in bricks[:N] if
@@ -246,23 +245,19 @@ def _trim_orders(order_list, limit=50):
     return orders
 
 
-def _generate_vendors(optimize_parts, notenough, vendors_always, vendors_rare,
-                      vendors_notenough, max_vendors, harsh=False):
-    lots_notenough = []
-    vendors_notenough = []
-    if len(notenough):
-        for part in notenough:
-            lots_part = []
-            all_lots_part = part.lots[:]
-            ran.shuffle(lots_part)
-            amount = 0
-            while amount < part.qty:
-                lots_part.append(all_lots_part.pop())
-                amount = sum(lot.order_amount for lot in lots_part)
-            lots_part = list(lots_part)
-            if amount == part.qty:
-                lots_notenough.extend(lots_part)
-                continue
+def _not_enough(notenough):
+    lots = []
+    vendors = []
+    for part in notenough:
+        lots_part = []
+        all_lots_part = part.lots[:]
+        ran.shuffle(lots_part)
+        amount = 0
+        while amount < part.qty:
+            lots_part.append(all_lots_part.pop())
+            amount = sum(lot.order_amount for lot in lots_part)
+        lots_part = list(lots_part)
+        if amount != part.qty:
             lots_part.sort(key=lambda lot: lot.order_amount)
             while amount > part.qty:
                 temp = lots_part.pop()
@@ -270,10 +265,17 @@ def _generate_vendors(optimize_parts, notenough, vendors_always, vendors_rare,
                 if amount < part.qty:
                     lots_part.append(temp)
                     break
-            lots_notenough.extend(lots_part)
-        vendors_notenough = list(set(lot.vendor for lot in lots_notenough))
+        lots.extend(lots_part)
+    vendors = list(set(lot.vendor for lot in lots))
+    return lots, vendors
 
-    vendors_rare = vendors_of_rare_bricks(optimize_parts)
+
+def _generate_vendors(optimize_parts, notenough, vendors_always,
+                      vendors_close_big, vendors_close, vendors_far,
+                      max_vendors, harsh=False):
+    lots_notenough, vendors_notenough = _not_enough(notenough)
+
+    vendors_rare = _vendors_of_rare_bricks(optimize_parts)
 
     nrvendors_now = len(vendors_always) + len(vendors_rare) + len(vendors_notenough)
     x = max_vendors - nrvendors_now
@@ -281,30 +283,36 @@ def _generate_vendors(optimize_parts, notenough, vendors_always, vendors_rare,
     howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors//7))
     howmany_close_big = ran.randint(1, howmany_vendors//2 + 1)
     howmany_close = howmany_vendors - howmany_close_big - howmany_far
-    try_vendors = list(set(vendors_always + vendors_notenough + vendors_rare
-                           + ran.sample(vendors_close_big, howmany_close_big)
-                           + ran.sample(vendors_close, howmany_close)
-                           + ran.sample(vendors_far, howmany_far)))
-    
-    return try_vendors
+    vendors = list(set(vendors_always + vendors_notenough + vendors_rare
+                       + ran.sample(vendors_close_big, howmany_close_big)
+                       + ran.sample(vendors_close, howmany_close)
+                       + ran.sample(vendors_far, howmany_far)))
+
+    return lots_notenough, vendors
 
 
 def find_order(optimize_parts, lots_always, vendors_always, vendors_close_big,
                vendors_close, vendors_far, notenough,
                max_vendors=10, harsh=False, weight=20, w_far=150,
                verboseprint=print, timeout=10.):
-    t_end = datetime.datetime.now() + datetime.timedelta(minutes=timeout)
+    now = datetime.datetime.now
+    t_end = now() + datetime.timedelta(minutes=timeout)
     verboseprint("Starting optimisation; will take until {0:02d}:{1:02d}"
                  .format(t_end.hour, t_end.minute))
     i = j = 0
     vendorwarning_given = False
     orders = set()
-    endat = time.time() + timeout
-
-    while (time.time() < endat):
+    while (now() < t_end):
         i += 1
         try:
-            try_vendors = _generate_vendors()
+            lots_notenough, try_vendors = _generate_vendors(optimize_parts,
+                                                            notenough,
+                                                            vendors_always,
+                                                            vendors_close_big,
+                                                            vendors_close,
+                                                            vendors_far,
+                                                            max_vendors,
+                                                            harsh=harsh)
         except ValueError:
             if not vendorwarning_given:
                 vendorwarning_given = True
