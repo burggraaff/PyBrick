@@ -279,20 +279,24 @@ def _generate_vendors(optimize_parts, notenough, vendors_always,
     vendors_pre = set.union(vendors_always, vendors_notenough, vendors_rare)
     nrvendors_pre = len(vendors_pre)
 
-    x = max_vendors - nrvendors_pre
-    howmany_vendors = ran.randint(1, x)
+    choices_left = max_vendors - nrvendors_pre
+    howmany_vendors = ran.randint(1, choices_left)
 
-    howmany_far = 0 if harsh else ran.randint(0, int(howmany_vendors//7))
-    which_far = set(ran.sample(vendors_far, howmany_far))
+    if harsh:
+        which_far = set()
+    else:
+        howmany_far = ran.randint(0, howmany_vendors//7)
+        which_far = set(ran.sample(vendors_far, howmany_far))
 
     howmany_close_big = ran.randint(1, howmany_vendors//2 + 1)
     which_close_big = set(ran.sample(vendors_close_big, howmany_close_big))
 
     howmany_close = howmany_vendors - howmany_close_big - howmany_far
-    which_close = set(ran.sample(vendors_far, howmany_far))
+    which_close = set(ran.sample(vendors_close, howmany_close))
 
     vendors = set.union(vendors_pre, which_far, which_close_big, which_close)
-    print(howmany_vendors, len(vendors), howmany_far, howmany_close_big, howmany_close)
+    print(choices_left, howmany_vendors, len(vendors), howmany_far, howmany_close_big, howmany_close)
+
     return lots_notenough, vendors
 
 
