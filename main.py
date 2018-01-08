@@ -17,9 +17,9 @@ parser.add_argument("-s", "--save_to", help="Location to save order list to",
 parser.add_argument("-e", "--settings_file", help="File containing settings",
                     default="settings.txt")
 parser.add_argument("-t", "--timeout", help="How many minutes to optimise for",
-                    type=float, default=10.0)
+                    type=float, default=1.0)
 parser.add_argument("-m", "--max_vendors", help="Maximum number of vendors to\
-                    use", type=int, default=10)
+                    use", type=int, default=17)
 parser.add_argument("-l", "--len_vendors", help="Number of vendors per brick\
                     to fetch from Bricklink per brick", type=int, default=100)
 parser.add_argument("-w", "--weight", help="Weight to add for nearby vendors",
