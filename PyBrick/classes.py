@@ -199,23 +199,25 @@ class Vendor(object):
                                                 loc=self.loc,
                                                 stock=len(self.stock))
 
+
 class Order(object):
     def __init__(self, lots, weight, w_far):
         self.lots = lots
-        self.vendors = set(lot.vendor for lot in self.lots)
-        self._score(weight, w_far)
+        self.vendors = {lot.vendor for lot in self.lots}
+        self.weight = weight
+        self.w_far = w_far
 
-    def add_lot(self, lot, weight, w_far):
+    def add_lot(self, lot):
         self.lots.append(lot)
         self.vendors.add(lot.vendor)
-        self._score(weight, w_far)
 
     def totalprice(self):
         return round(sum(lot.price_total for lot in self.lots), 3)
 
-    def _score(self, weight, w_far):  # NOTE THIS DOES NOT RETURN ANYTHING
-        self.score = round(self.totalprice() + weight * len(self.vendors) +
-                           w_far * len([v for v in self.vendors if not v.close]), 3)
+    def score(self):
+        return round(self.totalprice() + self.weight * len(self.vendors)
+                     + self.w_far * len([v for v in self.vendors
+                                         if not v.close]))
 
     def give_URLs(self):
         URLs = sorted([lot.URL+" | "+str(lot.order_amount)+"\n" for lot in self.lots])
@@ -237,13 +239,15 @@ class Order(object):
         return {vendor: round(sum([lot.price_total for lot in self.lots if lot.vendor == vendor]), 3) for vendor in self.vendors}
 
     def __eq__(self, other):
-        return self.score == other.score
+        return self.score() == other.score()
 
     def __lt__(self, other):
-        return self.score < other.score
+        return self.score() < other.score()
 
     def __hash__(self):
-        return hash(self.score)
+        return hash(self.score())
 
     def __repr__(self):
-        return "Order of score "+str(self.score)+" with price "+str(self.totalprice())+" at "+str(len(self.vendors))+" vendors"
+        return "Order (Score {score:>5}; Price {price:>8.2f}; \
+Vendors {vendors:>3})".format(score=self.score(), price=self.totalprice(),
+                              vendors=len(self.vendors))
