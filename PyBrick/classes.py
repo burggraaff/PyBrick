@@ -153,8 +153,9 @@ class Lot(object):
         return cls(part, vendor, price, qty, step, lotnr)
 
     def __repr__(self):
-        return "E"+str(self.price_total)+" for "+self.part.code+" at "+self.vendor.storename.encode("ascii", "replace")+" ("+self.vendor.loc+")"
-
+        return "Lot (Part {part:8}; Price {price:>6.2f}; Vendor {vendor}, {loc})"\
+               .format(part=self.part.code, price=self.price_total,
+                       vendor=self.vendor.storename, loc=self.vendor.loc)
 
 class Vendor(object):
     def __init__(self, name, storename, loc, minbuy, preferred=[]):
