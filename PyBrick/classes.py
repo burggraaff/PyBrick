@@ -11,6 +11,11 @@ try:
 except ImportError:
     from urllib.parse import urlencode  # python3
 
+try:  # py2
+    iteritems = dict.iteritems
+except AttributeError:  # py3
+    iteritems = dict.items
+
 
 class Brick(object):
     """
@@ -152,6 +157,9 @@ class Lot(object):
         lotnr = tag.findAll("a")[1].attrs["href"].split("=")[-1]
         return cls(part, vendor, price, qty, step, lotnr)
 
+    def order_URL(self):
+        return "{url} | {amount}".format(url=self.URL, amount=self.order_amount)
+
     def __repr__(self):
         return "Lot (Part {part:8}; Price {price:>6.2f}; Vendor {vendor}, \
 {loc})".format(part=self.part.code, price=self.price_total,
@@ -213,6 +221,9 @@ class Order(object):
         self.lots.append(lot)
         self.vendors.add(lot.vendor)
 
+    def sort(self):
+        self.lots = sorted(self.lots, key=lambda lot: (lot.vendor.storename, lot.order_amount))
+
     def totalprice(self):
         return round(sum(lot.price_total for lot in self.lots), 3)
 
@@ -222,8 +233,10 @@ class Order(object):
                                          if not v.close]))
 
     def give_URLs(self):
-        URLs = sorted([lot.URL+" | "+str(lot.order_amount)+"\n" for lot in self.lots])
-        URLstring = "".join(URLs)[:-1]  # [:-1] to remove trailing \n
+        lpv = self.lots_per_vendor()
+        lpv_URLs = [[lot.order_URL() for lot in lst] for lst in lpv.values()]
+        lpv_str = ["\n".join(URLstring) for URLstring in lpv_URLs]
+        URLstring = "\n\n".join(lpv_str)
         return URLstring
 
     def save(self, filename="a.order"):
@@ -235,7 +248,11 @@ class Order(object):
         return all([sum(lot.price_total for lot in self.lots if lot.vendor == vendor) >= vendor.minbuy for vendor in self.vendors])
 
     def lots_per_vendor(self):
-        return {vendor: len([lot for lot in self.lots if lot.vendor == vendor]) for vendor in self.vendors}
+        return {vendor: sorted([lot for lot in self.lots if lot.vendor == vendor], key=lambda lot: lot.order_amount) for vendor in self.vendors}
+
+    def nr_lots_per_vendor(self):
+        lpv = self.lots_per_vendor()
+        return {vendor: len(lots) for vendor, lots in iteritems(lpv)}
 
     def money_per_vendor(self):
         return {vendor: round(sum([lot.price_total for lot in self.lots if lot.vendor == vendor]), 3) for vendor in self.vendors}
