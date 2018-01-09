@@ -11,6 +11,11 @@ try:
 except ImportError:
     from urllib.parse import urlencode  # python3
 
+try:  # py2
+    iteritems = dict.iteritems
+except AttributeError:  # py3
+    iteritems = dict.items
+
 
 class Brick(object):
     """
@@ -69,6 +74,14 @@ class Brick(object):
         Sort the lots of this brick from cheapest to most expensive
         """
         self.lots.sort(key=lambda lot: lot.price_total)
+
+    def cheapest_lot(self, vendors):
+        """
+        Find the cheapest lot of this item from the given vendors
+        """
+        available_lots = [lot for lot in self.lots if lot.vendor in vendors]
+        available_lots.sort(key=lambda lot: lot.price_total)
+        return available_lots[0]
 
     def enough(self):
         """
@@ -144,8 +157,13 @@ class Lot(object):
         lotnr = tag.findAll("a")[1].attrs["href"].split("=")[-1]
         return cls(part, vendor, price, qty, step, lotnr)
 
+    def order_URL(self):
+        return "{url} | {amount}".format(url=self.URL, amount=self.order_amount)
+
     def __repr__(self):
-        return "E"+str(self.price_total)+" for "+self.part.code+" at "+self.vendor.storename.encode("ascii", "replace")+" ("+self.vendor.loc+")"
+        return "Lot (Part {part:8}; Price {price:>6.2f}; Vendor {vendor}, \
+{loc})".format(part=self.part.code, price=self.price_total,
+               vendor=self.vendor.storename, loc=self.vendor.loc)
 
 
 class Vendor(object):
@@ -180,30 +198,45 @@ class Vendor(object):
         if lot.part not in self.stock_parts:
             self.stock_parts.append(lot.part)
 
+    def __eq__(self, other):
+        return self.storename == other.storename
+
+    def __hash__(self):
+        return hash(self.storename)
+
     def __repr__(self):
-        return self.storename.encode("ascii", "replace")+" in "+self.loc+" with "+str(len(self.stock))+" items"
+        return "{name} ({loc}, {stock})".format(name=self.storename,
+                                                loc=self.loc,
+                                                stock=len(self.stock))
+
 
 class Order(object):
     def __init__(self, lots, weight, w_far):
         self.lots = lots
-        self.vendors = set(lot.vendor for lot in self.lots)
-        self._score(weight, w_far)
+        self.vendors = {lot.vendor for lot in self.lots}
+        self.weight = weight
+        self.w_far = w_far
 
-    def add_lot(self, lot, weight, w_far):
+    def add_lot(self, lot):
         self.lots.append(lot)
         self.vendors.add(lot.vendor)
-        self._score(weight, w_far)
+
+    def sort(self):
+        self.lots = sorted(self.lots, key=lambda lot: (lot.vendor.storename, lot.order_amount))
 
     def totalprice(self):
         return round(sum(lot.price_total for lot in self.lots), 3)
 
-    def _score(self, weight, w_far):  # NOTE THIS DOES NOT RETURN ANYTHING
-        self.score = round(self.totalprice() + weight * len(self.vendors) +
-                           w_far * len([v for v in self.vendors if not v.close]), 3)
+    def score(self):
+        return round(self.totalprice() + self.weight * len(self.vendors)
+                     + self.w_far * len([v for v in self.vendors
+                                         if not v.close]))
 
     def give_URLs(self):
-        URLs = sorted([lot.URL+" | "+str(lot.order_amount)+"\n" for lot in self.lots])
-        URLstring = "".join(URLs)[:-1]  # [:-1] to remove trailing \n
+        lpv = self.lots_per_vendor()
+        lpv_URLs = [[lot.order_URL() for lot in lst] for lst in lpv.values()]
+        lpv_str = ["\n".join(URLstring) for URLstring in lpv_URLs]
+        URLstring = "\n\n".join(lpv_str)
         return URLstring
 
     def save(self, filename="a.order"):
@@ -215,19 +248,25 @@ class Order(object):
         return all([sum(lot.price_total for lot in self.lots if lot.vendor == vendor) >= vendor.minbuy for vendor in self.vendors])
 
     def lots_per_vendor(self):
-        return {vendor: len([lot for lot in self.lots if lot.vendor == vendor]) for vendor in self.vendors}
+        return {vendor: sorted([lot for lot in self.lots if lot.vendor == vendor], key=lambda lot: lot.order_amount) for vendor in self.vendors}
+
+    def nr_lots_per_vendor(self):
+        lpv = self.lots_per_vendor()
+        return {vendor: len(lots) for vendor, lots in iteritems(lpv)}
 
     def money_per_vendor(self):
         return {vendor: round(sum([lot.price_total for lot in self.lots if lot.vendor == vendor]), 3) for vendor in self.vendors}
 
     def __eq__(self, other):
-        return self.score == other.score
+        return self.score() == other.score()
 
     def __lt__(self, other):
-        return self.score < other.score
+        return self.score() < other.score()
 
     def __hash__(self):
-        return hash(self.score)
+        return hash(self.score())
 
     def __repr__(self):
-        return "Order of score "+str(self.score)+" with price "+str(self.totalprice())+" at "+str(len(self.vendors))+" vendors"
+        return "Order (Score {score:>5}; Price {price:>8.2f}; \
+Vendors {vendors:>3})".format(score=self.score(), price=self.totalprice(),
+                              vendors=len(self.vendors))
