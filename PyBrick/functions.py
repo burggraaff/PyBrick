@@ -152,7 +152,7 @@ def check_enough(bricks):
         raise ValueError("You will NEVER be able to order sufficient parts of \
                          the following bricks with current settings. Consider \
                          ordering these in different colours:\n \
-                         {never}".format(never))
+                         {never}".format(never=never))
     notenough = []
     for part in parts:
         if not part.enough():
