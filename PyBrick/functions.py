@@ -219,6 +219,8 @@ def read_vendors(allbricks, settings, len_vendors=100, harsh=False,
             if harsh and new_vendor.loc not in settings["preferred_countries"]:
                 continue
             new_name = new_vendor.storename
+            if new_name in settings["blacklist"]:
+                continue
             if new_name not in vendors:
                 vendors[new_name] = new_vendor
             lot = Lot.fromHTML(q, part, vendors[new_name])
