@@ -310,6 +310,7 @@ def _generate_vendors(optimize_parts, notenough, vendors_always,
     howmany_vendors = ran.randint(1, choices_left)
 
     if harsh:
+        howmany_far = 0
         which_far = set()
     else:
         howmany_far = ran.randint(0, howmany_vendors//7)
